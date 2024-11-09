@@ -1,0 +1,6 @@
+@SchoolSystem.UI.WebAPI_HostAddress = http://localhost:5050
+
+GET {{SchoolSystem.UI.WebAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
