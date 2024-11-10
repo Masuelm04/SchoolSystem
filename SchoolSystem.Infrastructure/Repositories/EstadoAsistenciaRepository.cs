@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SchoolSystem.Infrastructure.Repositories
 {
-    public class EstadoAsistenciaRepository : RepositoryBase<Curso>
+    public class EstadoAsistenciaRepository : RepositoryBase<EstadoAsistencia>
     {
         private readonly ApplicationDbContext _context;
         public EstadoAsistenciaRepository(ApplicationDbContext context) : base(context)

@@ -20,10 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SchoolSystem.Core\SchoolSystem.Core.csproj" />
     <ProjectReference Include="..\SchoolSystem.Domain\SchoolSystem.Domain.csproj" />
     <ProjectReference Include="..\SchoolSystem.Infrastructure\SchoolSystem.Infrastructure.csproj" />
