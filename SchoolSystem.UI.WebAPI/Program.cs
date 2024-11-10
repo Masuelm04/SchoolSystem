@@ -15,6 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(op =>
 
 builder.Services.AddScoped<IRepository<Curso>, CursoRepository>();
 builder.Services.AddScoped<IRepository<EstadoAsistencia>, EstadoAsistenciaRepository>();
+builder.Services.AddScoped<IRepository<Materia>, MateriaRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

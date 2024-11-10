@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SchoolSystem.Core.DTOs.Curso;
 using SchoolSystem.Core.DTOs.EstadoAsistencia;
+using SchoolSystem.Core.DTOs.Materia;
 using SchoolSystem.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,9 @@ namespace SchoolSystem.Infrastructure.Mappings
 
             CreateMap<EstadoAsistencia, EstadoAsistenciaDTO>().ReverseMap();
             CreateMap<ModEstadoAsistenciaDTO, EstadoAsistencia>();
+
+            CreateMap<Materia, MateriaDTO>().ReverseMap();
+            CreateMap<ModMateriaDTO, Materia>();
         }
     }
 }
