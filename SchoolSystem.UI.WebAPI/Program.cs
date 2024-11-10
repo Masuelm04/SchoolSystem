@@ -13,6 +13,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(op =>
     op.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL"));
 });
 
+builder.Services.AddScoped<IRepository<Asistencia>, AsistenciaRepository>();
 builder.Services.AddScoped<IRepository<Calificacion>, CalificacionRepository>();
 builder.Services.AddScoped<IRepository<Curso>, CursoRepository>();
 builder.Services.AddScoped<IRepository<EstadoAsistencia>, EstadoAsistenciaRepository>();

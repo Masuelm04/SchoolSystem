@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SchoolSystem.Core.DTOs.Asistencia;
 using SchoolSystem.Core.DTOs.Calificacion;
 using SchoolSystem.Core.DTOs.Curso;
 using SchoolSystem.Core.DTOs.EstadoAsistencia;
@@ -17,6 +18,12 @@ namespace SchoolSystem.Infrastructure.Mappings
     {
         public MappingProfile()
         {
+            CreateMap<Asistencia, AsistenciaDTO>().
+                ForMember(d => d.NombreEstudiante, o => o.MapFrom(c => c.Estudiante.Nombre)).
+                ForMember(d => d.NombreEstadoAsistencia, o => o.MapFrom(c => c.Estado.Nombre)).ReverseMap();
+            CreateMap<ModAsistenciaDTO, Asistencia>();
+            CreateMap<Asistencia, AsistenciaResponseDTO>();
+
             CreateMap<Calificacion, CalificacionDTO>().
                 ForMember(d => d.NombreEstudiante, o => o.MapFrom(c => c.Estudiante.Nombre)).
                 ForMember(d => d.NombreMateria, o => o.MapFrom(c => c.Materia.Nombre)).ReverseMap();
