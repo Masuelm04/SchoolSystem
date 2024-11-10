@@ -13,6 +13,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(op =>
     op.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL"));
 });
 
+builder.Services.AddScoped<IRepository<Curso>, CursoRepository>();
 builder.Services.AddScoped<IRepository<EstadoAsistencia>, EstadoAsistenciaRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
