@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SchoolSystem.Core.DTOs.Curso;
 using SchoolSystem.Core.DTOs.EstadoAsistencia;
 using SchoolSystem.Domain.Entities;
 using System;
@@ -13,6 +14,9 @@ namespace SchoolSystem.Infrastructure.Mappings
     {
         public MappingProfile()
         {
+            CreateMap<Curso, CursoDTO>().ReverseMap();
+            CreateMap<ModCursoDTO, Curso>();
+
             CreateMap<EstadoAsistencia, EstadoAsistenciaDTO>().ReverseMap();
             CreateMap<ModEstadoAsistenciaDTO, EstadoAsistencia>();
         }
