@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using SchoolSystem.Core.Interfaces;
+using SchoolSystem.Domain.Entities;
 using SchoolSystem.Infrastructure.Data;
+using SchoolSystem.Infrastructure.Mappings;
+using SchoolSystem.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +12,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(op =>
 {
     op.UseSqlServer(builder.Configuration.GetConnectionString("CadenaSQL"));
 });
+
+builder.Services.AddScoped<IRepository<EstadoAsistencia>, EstadoAsistenciaRepository>();
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
