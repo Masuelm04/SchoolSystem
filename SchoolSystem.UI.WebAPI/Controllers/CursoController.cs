@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Core.DTOs.Curso;
 using SchoolSystem.Core.DTOs.EstadoAsistencia;
+using SchoolSystem.Core.DTOs.Materia;
 using SchoolSystem.Core.Interfaces;
 using SchoolSystem.Domain.Entities;
+using SchoolSystem.Infrastructure.Data;
+using SchoolSystem.Infrastructure.Repositories;
 
 namespace SchoolSystem.UI.WebAPI.Controllers
 {
@@ -13,11 +17,15 @@ namespace SchoolSystem.UI.WebAPI.Controllers
     public class CursoController : ControllerBase
     {
         private readonly IRepository<Curso> _repository;
+        private readonly ICursoRepository _cursoRepository;
         private readonly IMapper _mapper;
-        public CursoController(IRepository<Curso> repository, IMapper mapper)
+        private readonly ApplicationDbContext _context;
+        public CursoController(IRepository<Curso> repository, ICursoRepository cursoRepository, IMapper mapper, ApplicationDbContext context)
         {
             _repository = repository;
+            _cursoRepository = cursoRepository;
             _mapper = mapper;
+            _context = context;
         }
 
         [HttpGet("ListarCursos")]
@@ -26,6 +34,20 @@ namespace SchoolSystem.UI.WebAPI.Controllers
             var cursos = await _repository.GetAllAsync();
             var cursosDTOs = _mapper.Map<IEnumerable<CursoDTO>>(cursos);
             return Ok(cursosDTOs);
+        }
+
+        [HttpGet("ListarCursosConMaterias")]
+        public async Task<ActionResult<IEnumerable<CursoDTO>>> GetCursosConMateriasAsync()
+        {
+            var cursos = await _cursoRepository.GetCursosConMateriasAsync();
+
+            if (cursos == null || !cursos.Any())
+            {
+                return NotFound(new { Message = "No se encontraron cursos con materias asociadas." });
+            }
+
+            var cursosDTO = _mapper.Map<IEnumerable<CursoDTO>>(cursos);
+            return Ok(cursosDTO);
         }
 
         [HttpGet("ObtenerCursoPorID/{id}")]
@@ -42,6 +64,28 @@ namespace SchoolSystem.UI.WebAPI.Controllers
             return Ok(cursoDTO);
         }
 
+        [HttpGet("ObtenerMateriasPorCurso/{idCurso}")]
+        public async Task<ActionResult<IEnumerable<MateriaCursoDTO>>> ObtenerMateriasPorCurso(int idCurso)
+        {
+            var materias = await _cursoRepository.ObtenerMateriasPorCursoAsync(idCurso);
+            var materiasDTO = _mapper.Map<IEnumerable<MateriaCursoDTO>>(materias);
+            return Ok(materiasDTO);
+        }
+
+        [HttpGet("CursoTieneMateria/{idCurso}/{idMateria}")]
+        public async Task<ActionResult<bool>> CursoTieneMateriaAsync(int idCurso, int idMateria)
+        {
+            var cursoMateria = await _context.CursosMaterias
+                .FirstOrDefaultAsync(cm => cm.IdCurso == idCurso && cm.IdMateria == idMateria && cm.Curso.Eliminado == false && cm.Materia.Eliminado == false);
+
+            if (cursoMateria == null)
+            {
+                return Ok(false);
+            }
+
+            return Ok(true);
+        }
+
         [HttpPost("RegistrarCurso")]
         public async Task<ActionResult<CursoDTO>> RegistrarCurso([FromBody] ModCursoDTO cursosDTO)
         {
@@ -49,6 +93,13 @@ namespace SchoolSystem.UI.WebAPI.Controllers
             await _repository.AddAsync(curso);
             var cursoDTO = _mapper.Map<CursoDTO>(curso);
             return CreatedAtAction(nameof(ObtenerCursoPorID), new { id = cursoDTO.Id }, cursoDTO);
+        }
+
+        [HttpPost("{idCurso}/AsignarMateria/{idMateria}")]
+        public async Task<IActionResult> AsignarMateria(int idCurso, int idMateria)
+        {
+            await _cursoRepository.AsignarMateriaAsync(idCurso, idMateria);
+            return Ok(new { Message = "Materia asignada al curso correctamente." });
         }
 
         [HttpPut("EditarCurso/{id}")]
@@ -85,6 +136,13 @@ namespace SchoolSystem.UI.WebAPI.Controllers
 
             await _repository.DeleteByIdAsync(id);
             return Ok(curso);
+        }
+
+        [HttpDelete("{idCurso}/EliminarAsignacionMateria/{idMateria}")]
+        public async Task<IActionResult> EliminarAsignacionMateria(int idCurso, int idMateria)
+        {
+            await _cursoRepository.EliminarAsignacionMateriaAsync(idCurso, idMateria);
+            return Ok(new { Message = "Asignación de materia eliminada del curso correctamente." });
         }
     }
 }

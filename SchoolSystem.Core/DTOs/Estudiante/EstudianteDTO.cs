@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,5 +21,9 @@ namespace SchoolSystem.Core.DTOs.Estudiante
         public string NombreCurso { get; set; }
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
         public DateTime FechaRegistro { get; set; }
+
+
+        public List<EstudianteCalificacionDTO> Calificaciones { get; set; }
+        public List<EstudianteAsistenciaDTO> Asistencias { get; set; } 
     }
 }

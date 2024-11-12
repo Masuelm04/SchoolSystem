@@ -16,9 +16,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(op =>
 builder.Services.AddScoped<IRepository<Asistencia>, AsistenciaRepository>();
 builder.Services.AddScoped<IRepository<Calificacion>, CalificacionRepository>();
 builder.Services.AddScoped<IRepository<Curso>, CursoRepository>();
+builder.Services.AddScoped<ICursoRepository, CursoRepository>();
 builder.Services.AddScoped<IRepository<EstadoAsistencia>, EstadoAsistenciaRepository>();
 builder.Services.AddScoped<IRepository<Estudiante>, EstudianteRepository>();
 builder.Services.AddScoped<IRepository<Materia>, MateriaRepository>();
+builder.Services.AddScoped<IMateriaRepository, MateriaRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
