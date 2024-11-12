@@ -1,19 +1,17 @@
-﻿using SchoolSystem.Core.DTOs.Materia;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SchoolSystem.Core.DTOs.Curso
+namespace SchoolSystem.Core.DTOs.Materia
 {
-    public class CursoDTO
+    public class MateriaCursoDTO
     {
         public int Id { get; set; }
         [StringLength(30)]
         public string Nombre { get; set; }
-        public List<MateriaCursoDTO> Materias { get; set; }
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
         public DateTime FechaRegistro { get; set; }
     }
