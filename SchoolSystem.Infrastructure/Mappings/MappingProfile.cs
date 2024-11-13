@@ -48,18 +48,9 @@ namespace SchoolSystem.Infrastructure.Mappings
 
             //Estudiante
             CreateMap<Estudiante, EstudianteDTO>().
-                ForMember(d => d.NombreCurso, o => o.MapFrom(c => c.Curso.Nombre)).
-                ForMember(d => d.Calificaciones, o => o.MapFrom(c => c.Calificaciones)).
-                ForMember(d => d.Asistencias, o => o.MapFrom(c => c.Asistencias)).ReverseMap();
+                ForMember(d => d.NombreCurso, o => o.MapFrom(c => c.Curso.Nombre)).ReverseMap();
             CreateMap<ModEstudianteDTO, Estudiante>();
             CreateMap<Estudiante, EstudianteResponseDTO>();
-
-            /////////////////////////////////
-            CreateMap<Calificacion, EstudianteCalificacionDTO>().
-                ForMember(d => d.NombreMateria, o => o.MapFrom(c => c.Materia.Nombre)).ReverseMap();
-            CreateMap<Asistencia, EstudianteAsistenciaDTO>().
-                ForMember(d => d.NombreEstadoAsistencia, o => o.MapFrom(c => c.Estado.Nombre)).ReverseMap();
-            //////////////////////////
 
 
             //Materia

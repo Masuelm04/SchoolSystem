@@ -23,9 +23,7 @@ namespace SchoolSystem.UI.WebAPI.Controllers
         public async Task<ActionResult<IEnumerable<EstudianteDTO>>> ListarEstudiantes()
         {
             var estudiantes = await _repository.GetAllAsync(a => !a.Eliminado && a.Curso != null && !a.Curso.Eliminado,
-                a => a.Curso,
-                a => a.Calificaciones,
-                a => a.Asistencias
+                a => a.Curso
             );
 
             var estudiantesDTOs = _mapper.Map<IEnumerable<EstudianteDTO>>(estudiantes);
@@ -36,9 +34,7 @@ namespace SchoolSystem.UI.WebAPI.Controllers
         public async Task<ActionResult<EstudianteDTO>> ObtenerEstudiantePorID(int id)
         {
             var estudiante = await _repository.GetByIdAsync(id, 
-                a => a.Curso,
-                a => a.Calificaciones,
-                a => a.Asistencias);
+                a => a.Curso);
 
             if (estudiante == null)
             {
