@@ -37,7 +37,7 @@ namespace SchoolSystem.UI.WebAPI.Controllers
         }
 
         [HttpGet("ListarCursosConMaterias")]
-        public async Task<ActionResult<IEnumerable<CursoDTO>>> GetCursosConMateriasAsync()
+        public async Task<ActionResult<IEnumerable<CursoMateriaDTO>>> GetCursosConMateriasAsync()
         {
             var cursos = await _cursoRepository.GetCursosConMateriasAsync();
 
@@ -46,7 +46,7 @@ namespace SchoolSystem.UI.WebAPI.Controllers
                 return NotFound(new { Message = "No se encontraron cursos con materias asociadas." });
             }
 
-            var cursosDTO = _mapper.Map<IEnumerable<CursoDTO>>(cursos);
+            var cursosDTO = _mapper.Map<IEnumerable<CursoMateriaDTO>>(cursos);
             return Ok(cursosDTO);
         }
 
@@ -65,10 +65,10 @@ namespace SchoolSystem.UI.WebAPI.Controllers
         }
 
         [HttpGet("ObtenerMateriasPorCurso/{idCurso}")]
-        public async Task<ActionResult<IEnumerable<MateriaCursoDTO>>> ObtenerMateriasPorCurso(int idCurso)
+        public async Task<ActionResult<IEnumerable<MateriaDTO>>> ObtenerMateriasPorCurso(int idCurso)
         {
             var materias = await _cursoRepository.ObtenerMateriasPorCursoAsync(idCurso);
-            var materiasDTO = _mapper.Map<IEnumerable<MateriaCursoDTO>>(materias);
+            var materiasDTO = _mapper.Map<IEnumerable<MateriaDTO>>(materias);
             return Ok(materiasDTO);
         }
 
