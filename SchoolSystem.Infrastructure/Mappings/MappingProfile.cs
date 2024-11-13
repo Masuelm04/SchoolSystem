@@ -35,9 +35,9 @@ namespace SchoolSystem.Infrastructure.Mappings
 
             
             //Curso
-            CreateMap<Curso, CursoDTO>().
+            CreateMap<Curso, CursoMateriaDTO>().
                 ForMember(d => d.Materias, o => o.MapFrom(c => c.CursoMaterias.Select(cm => cm.Materia))).ReverseMap();
-            CreateMap<Curso, CursoMateriaDTO>().ReverseMap();
+            CreateMap<Curso, CursoDTO>().ReverseMap();
             CreateMap<ModCursoDTO, Curso>();
 
 
@@ -63,9 +63,9 @@ namespace SchoolSystem.Infrastructure.Mappings
 
 
             //Materia
-            CreateMap<Materia, MateriaDTO>().
+            CreateMap<Materia, MateriaCursoDTO>().
                 ForMember(d => d.Cursos, o => o.MapFrom(c => c.CursoMaterias.Select(cm => cm.Curso))).ReverseMap();
-            CreateMap<Materia, MateriaCursoDTO>().ReverseMap();
+            CreateMap<Materia, MateriaDTO>().ReverseMap();
             CreateMap<ModMateriaDTO, Materia>();
         }
     }

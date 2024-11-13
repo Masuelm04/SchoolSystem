@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SchoolSystem.Core.DTOs.Curso;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace SchoolSystem.Core.DTOs.Materia
         public int Id { get; set; }
         [StringLength(30)]
         public string Nombre { get; set; }
+        public List<CursoDTO> Cursos { get; set; }
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
         public DateTime FechaRegistro { get; set; }
     }
