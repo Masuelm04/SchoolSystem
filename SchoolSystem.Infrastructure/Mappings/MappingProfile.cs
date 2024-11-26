@@ -20,10 +20,14 @@ namespace SchoolSystem.Infrastructure.Mappings
         {
             //Asistencia
             CreateMap<Asistencia, AsistenciaDTO>().
-                ForMember(d => d.NombreEstudiante, o => o.MapFrom(c => c.Estudiante.Nombre)).
-                ForMember(d => d.NombreEstadoAsistencia, o => o.MapFrom(c => c.Estado.Nombre)).ReverseMap();
+                ForMember(d => d.NombreEstudiante, o => o.MapFrom(c => $"{c.Estudiante.Nombre} {c.Estudiante.Apellido}")).
+                ForMember(d => d.EstadoAsistencia, o => o.MapFrom(c => c.Estado.Nombre)).ReverseMap();
             CreateMap<ModAsistenciaDTO, Asistencia>();
             CreateMap<Asistencia, AsistenciaResponseDTO>();
+            CreateMap<Asistencia, HistorialAsistenciaDTO>()
+            .ForMember(dest => dest.NombreEstudiante, opt => opt.MapFrom(src => $"{src.Estudiante.Nombre} {src.Estudiante.Apellido}"))
+            .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => src.Estado.Nombre))
+            .ForMember(dest => dest.Curso, opt => opt.MapFrom(src => src.Estudiante.Curso.Nombre));
 
 
             //Calificacion

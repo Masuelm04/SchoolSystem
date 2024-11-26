@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Core.DTOs.Asistencia;
 using SchoolSystem.Core.DTOs.Calificacion;
 using SchoolSystem.Core.Interfaces;
 using SchoolSystem.Domain.Entities;
+using SchoolSystem.Infrastructure.Data;
+using SchoolSystem.Infrastructure.Repositories;
 
 namespace SchoolSystem.UI.WebAPI.Controllers
 {
@@ -13,11 +16,35 @@ namespace SchoolSystem.UI.WebAPI.Controllers
     public class AsistenciaController : ControllerBase
     {
         private readonly IRepository<Asistencia> _repository;
+        private readonly IAsistenciaRepository _asistenciaRepository;
         private readonly IMapper _mapper;
-        public AsistenciaController(IRepository<Asistencia> repository, IMapper mapper)
+        private readonly ApplicationDbContext _context;
+        public AsistenciaController(IRepository<Asistencia> repository, IMapper mapper, ApplicationDbContext context, IAsistenciaRepository asistenciaRepository)
         {
             _repository = repository;
             _mapper = mapper;
+            _context = context;
+            _asistenciaRepository = asistenciaRepository;
+        }
+
+        [HttpGet("ObtenerHistorialAsistenciaPorFecha/{fecha}")]
+        public async Task<ActionResult<IEnumerable<HistorialAsistenciaDTO>>> ObtenerHistorialAsistencia(DateTime fecha)
+        {
+            if (fecha == null || fecha == DateTime.MinValue)
+            {
+                return BadRequest("La fecha proporcionada no es válida.");
+            }
+
+            var historial = await _asistenciaRepository.ObtenerHistorialPorFechaAsync(fecha);
+
+            if (historial == null || !historial.Any())
+            {
+                return NotFound($"No se encontraron registros de asistencia para la fecha {fecha.ToShortDateString()}.");
+            }
+
+            var historialDTO = _mapper.Map<IEnumerable<HistorialAsistenciaDTO>>(historial);
+
+            return Ok(historialDTO);
         }
 
         [HttpGet("ListarAsistencias")]
