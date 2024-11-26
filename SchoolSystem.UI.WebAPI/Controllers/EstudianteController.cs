@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SchoolSystem.Core.DTOs.Estudiante;
 using SchoolSystem.Core.Interfaces;
 using SchoolSystem.Domain.Entities;
+using SchoolSystem.Infrastructure.Data;
 
 namespace SchoolSystem.UI.WebAPI.Controllers
 {
@@ -13,10 +15,33 @@ namespace SchoolSystem.UI.WebAPI.Controllers
     {
         private readonly IRepository<Estudiante> _repository;
         private readonly IMapper _mapper;
-        public EstudianteController(IRepository<Estudiante> repository, IMapper mapper)
+        private readonly ApplicationDbContext _context;
+        public EstudianteController(IRepository<Estudiante> repository, IMapper mapper, ApplicationDbContext context)
         {
             _repository = repository;
             _mapper = mapper;
+            _context = context;
+        }
+
+        [HttpGet("FiltrarEstudiantes")]
+        public async Task<IActionResult> FiltrarEstudiantes(string? nombre, string? apellido, string? curso)
+        {
+            var query = _context.Estudiantes.AsQueryable();
+
+            if (string.IsNullOrEmpty(nombre) && string.IsNullOrEmpty(apellido) && string.IsNullOrEmpty(curso))
+                return BadRequest("Debe ingresar datos en los campos correspondientes para el filtrado de estudiantes.");
+
+            if (!string.IsNullOrEmpty(nombre))
+                query = query.Where(e => e.Nombre.Contains(nombre));
+
+            if (!string.IsNullOrEmpty(apellido))
+                query = query.Where(e => e.Apellido.Contains(apellido));
+
+            if (!string.IsNullOrEmpty(curso))
+                query = query.Where(e => e.Curso.Nombre == curso);
+
+            var estudiantes = await query.ToListAsync();
+            return Ok(estudiantes);
         }
 
         [HttpGet("ListarEstudiantes")]

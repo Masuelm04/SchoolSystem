@@ -1,4 +1,7 @@
-﻿using SchoolSystem.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using SchoolSystem.Core.DTOs.Asistencia;
+using SchoolSystem.Core.Interfaces;
+using SchoolSystem.Domain.Entities;
 using SchoolSystem.Infrastructure.Data;
 using System;
 using System.Collections.Generic;
@@ -8,12 +11,26 @@ using System.Threading.Tasks;
 
 namespace SchoolSystem.Infrastructure.Repositories
 {
-    public class AsistenciaRepository : RepositoryBase<Asistencia>
+    public class AsistenciaRepository : RepositoryBase<Asistencia>, IAsistenciaRepository
     {
         private readonly ApplicationDbContext _context;
         public AsistenciaRepository(ApplicationDbContext context) : base(context) 
         { 
             _context = context;
+        }
+
+        public async Task<IEnumerable<Asistencia>> ObtenerHistorialPorFechaAsync(DateTime fecha)
+        {
+            var historial = await _context.Asistencias
+                                  .Where(a => a.Fecha.Date == fecha.Date && a.Eliminado == false)
+                                  .Include(a => a.Estudiante) 
+                                  .Include(a => a.Estado)
+                                  .Include(a => a.Estudiante.Curso)
+                                  .OrderBy(a => a.Estudiante.Curso.Nombre)
+                                  .ThenBy(a => a.Estudiante.Nombre)
+                                  .ToListAsync();
+
+            return historial;
         }
     }
 }
