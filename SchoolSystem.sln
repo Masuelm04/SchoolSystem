@@ -9,20 +9,26 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastru
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{30B3AA96-A52F-4221-BAE7-26918B7C4163}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolSystem.Core", "SchoolSystem.Core\SchoolSystem.Core.csproj", "{FD197DA6-DF2A-4291-A91E-93146A775799}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchoolSystem.Core", "SchoolSystem.Core\SchoolSystem.Core.csproj", "{FD197DA6-DF2A-4291-A91E-93146A775799}"
 	ProjectSection(ProjectDependencies) = postProject
 		{B8DED00A-92A7-44E9-8970-459702146343} = {B8DED00A-92A7-44E9-8970-459702146343}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolSystem.Domain", "SchoolSystem.Domain\SchoolSystem.Domain.csproj", "{B8DED00A-92A7-44E9-8970-459702146343}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchoolSystem.Domain", "SchoolSystem.Domain\SchoolSystem.Domain.csproj", "{B8DED00A-92A7-44E9-8970-459702146343}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolSystem.Infrastructure", "SchoolSystem.Infrastructure\SchoolSystem.Infrastructure.csproj", "{41FF3530-5C97-4A69-9DD3-8CF8666F0498}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchoolSystem.Infrastructure", "SchoolSystem.Infrastructure\SchoolSystem.Infrastructure.csproj", "{41FF3530-5C97-4A69-9DD3-8CF8666F0498}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{FB74D3B9-308E-4B3F-9BE6-4C87DEF53F86}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FrontEnd", "FrontEnd", "{EBDA4BFC-2689-47E6-AE93-360CA94BB28C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolSystem.UI.WebAPI", "SchoolSystem.UI.WebAPI\SchoolSystem.UI.WebAPI.csproj", "{BE6AF24D-03C1-484A-A308-DEFB91E5C957}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SchoolSystem.UI.WebAPI", "SchoolSystem.UI.WebAPI\SchoolSystem.UI.WebAPI.csproj", "{BE6AF24D-03C1-484A-A308-DEFB91E5C957}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolSystem.UI.FrontEnd", "SchoolSystem.UI.FrontEnd\SchoolSystem.UI.FrontEnd.csproj", "{55070DDC-6113-407E-A049-044D31D230BC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B8DED00A-92A7-44E9-8970-459702146343} = {B8DED00A-92A7-44E9-8970-459702146343}
+		{FD197DA6-DF2A-4291-A91E-93146A775799} = {FD197DA6-DF2A-4291-A91E-93146A775799}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,6 +52,10 @@ Global
 		{BE6AF24D-03C1-484A-A308-DEFB91E5C957}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE6AF24D-03C1-484A-A308-DEFB91E5C957}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE6AF24D-03C1-484A-A308-DEFB91E5C957}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55070DDC-6113-407E-A049-044D31D230BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55070DDC-6113-407E-A049-044D31D230BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55070DDC-6113-407E-A049-044D31D230BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55070DDC-6113-407E-A049-044D31D230BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +67,7 @@ Global
 		{FB74D3B9-308E-4B3F-9BE6-4C87DEF53F86} = {30B3AA96-A52F-4221-BAE7-26918B7C4163}
 		{EBDA4BFC-2689-47E6-AE93-360CA94BB28C} = {30B3AA96-A52F-4221-BAE7-26918B7C4163}
 		{BE6AF24D-03C1-484A-A308-DEFB91E5C957} = {FB74D3B9-308E-4B3F-9BE6-4C87DEF53F86}
+		{55070DDC-6113-407E-A049-044D31D230BC} = {EBDA4BFC-2689-47E6-AE93-360CA94BB28C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {119F3350-43F5-4590-9B6E-04D2AE14DB29}

@@ -21,7 +21,8 @@ namespace SchoolSystem.Infrastructure.Mappings
             //Asistencia
             CreateMap<Asistencia, AsistenciaDTO>().
                 ForMember(d => d.NombreEstudiante, o => o.MapFrom(c => $"{c.Estudiante.Nombre} {c.Estudiante.Apellido}")).
-                ForMember(d => d.EstadoAsistencia, o => o.MapFrom(c => c.Estado.Nombre)).ReverseMap();
+                ForMember(d => d.EstadoAsistencia, o => o.MapFrom(c => c.Estado.Nombre)).
+                ForMember(d => d.Curso, o => o.MapFrom(c => c.Estudiante.Curso.Nombre)); 
             CreateMap<ModAsistenciaDTO, Asistencia>();
             CreateMap<Asistencia, AsistenciaResponseDTO>();
             CreateMap<Asistencia, HistorialAsistenciaDTO>()

@@ -8,6 +8,7 @@ namespace SchoolSystem.Core.DTOs.Asistencia
 {
     public class HistorialAsistenciaDTO
     {
+        public int Id { get; set; }
         public string NombreEstudiante { get; set; }
         public string Estado { get; set; }
         public string Curso { get; set; }
