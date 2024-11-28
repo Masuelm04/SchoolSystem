@@ -15,6 +15,7 @@ namespace SchoolSystem.Core.DTOs.Asistencia
         public DateTime Fecha { get; set; } = DateTime.Now;
         public string NombreEstudiante { get; set; }
         public string EstadoAsistencia { get; set; }
+        public string Curso { get; set; }
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
         public DateTime FechaRegistro { get; set; }
     }

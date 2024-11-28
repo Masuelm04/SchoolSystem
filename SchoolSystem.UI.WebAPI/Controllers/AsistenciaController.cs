@@ -52,7 +52,8 @@ namespace SchoolSystem.UI.WebAPI.Controllers
         {
             var asistencias = await _repository.GetAllAsync(a => !a.Eliminado && a.Estudiante != null && !a.Estudiante.Eliminado && a.Estado != null && !a.Estado.Eliminado,
                 a => a.Estudiante,
-                a => a.Estado
+                a => a.Estado,
+                a => a.Estudiante.Curso
             );
 
             var asistenciasDTOs = _mapper.Map<IEnumerable<AsistenciaDTO>>(asistencias);
