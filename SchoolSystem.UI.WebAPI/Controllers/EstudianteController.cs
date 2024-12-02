@@ -28,9 +28,6 @@ namespace SchoolSystem.UI.WebAPI.Controllers
         {
             var query = _context.Estudiantes.AsQueryable();
 
-            if (string.IsNullOrEmpty(nombre) && string.IsNullOrEmpty(apellido) && string.IsNullOrEmpty(curso))
-                return BadRequest("Debe ingresar datos en los campos correspondientes para el filtrado de estudiantes.");
-
             if (!string.IsNullOrEmpty(nombre))
                 query = query.Where(e => e.Nombre.Contains(nombre));
 
