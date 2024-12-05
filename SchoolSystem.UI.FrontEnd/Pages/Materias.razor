@@ -1,0 +1,133 @@
+﻿<BSToaster />
+@page "/materias"
+@using SchoolSystem.Core.DTOs.Materia
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject MateriaService materiaService
+
+<h2 class="text-center">MATERIAS</h2>
+
+@if (materias == null)
+{
+    <p class="text-center text-primary">LOADING...</p>
+}
+else
+{
+    <BSButton Color="BlazorStrap.BSColor.Success" Target="modalRegistrarMateria">Registrar Nueva Materia</BSButton>
+
+    <BSTable class="table-responsive-lg" Color="OTableColor" IsResponsive="OIsResponsive" IsBordered="OIsBordered" IsBorderLess="OIsBorderLess" IsCaptionTop="OIsCaptionTop" IsStriped="OIsStriped">
+        <caption class="text-black">Lista de Materias</caption>
+        <BSTHead>
+            <BSTR>
+                <BSTD>Id</BSTD>
+                <BSTD>Materia</BSTD>
+                <BSTD>Acciones</BSTD>
+            </BSTR>
+        </BSTHead>
+        <BSTBody>
+            @foreach (var materia in materias)
+            {
+                <BSTR>
+                    <BSTD AlignRow="OAlignRow" Color="OTDColor" IsActive="OIsActive">@materia.Id</BSTD>
+                    <BSTD>@materia.Nombre</BSTD>
+                    <BSTD>
+                        <BSButton Color="BlazorStrap.BSColor.Primary" Target="modalEditarMateria">Editar</BSButton>
+                        <BSButton Color="BlazorStrap.BSColor.Danger" Target="modalEliminarMateria">Eliminar</BSButton>
+                    </BSTD>
+                </BSTR>
+
+                @* Modal para confirmar la eliminación de materia *@
+
+                <BSModal DataId="modalEliminarMateria" IsStaticBackdrop="false">
+                    <Header>ELIMINAR MATERIA</Header>
+                    <Content>Estás seguro de eliminar este registro?</Content>
+                    <Footer Context="modal">
+                        <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="@(() => modal.HideAsync(false))">Cancelar</BSButton>
+                        <BSButton Color="BSColor.Danger" @onclick="() => DeleteMateria(materia.Id)">Eliminar</BSButton>
+                    </Footer>
+                </BSModal>
+            }
+        </BSTBody>
+    </BSTable>
+
+    @* Modal para registrar materia *@
+
+    <BSModal DataId="modalRegistrarMateria" HideOnValidSubmit="true" IsStaticBackdrop="true">
+        <BSForm Model="model" OnValidSubmit="@RegistrarMateria">
+            <DataAnnotationsValidator />
+            <BSModalHeader>Registrar Materia</BSModalHeader>
+            <BSModalContent>
+                <BSValidationSummary />
+
+                <div class="mb-3">
+                    <BSLabel>Materia</BSLabel>
+                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Nombre" />
+                    <BSFeedback For="@(() => model.Nombre)" />
+                </div>
+
+            </BSModalContent>
+            <BSModalFooter>
+                <BSButton Target="modalRegistrarEstado">Cancelar</BSButton>
+                <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
+            </BSModalFooter>
+        </BSForm>
+    </BSModal>
+}
+
+@code{
+    private List<MateriaDTO> materias;
+    private ModMateriaDTO model = new ModMateriaDTO();
+
+    private BSColor OTableColor { get; set; } = BSColor.Default;
+    private bool OIsResponsive { get; set; } = true;
+    private bool OIsBordered { get; set; }
+    private bool OIsBorderLess { get; set; }
+    private bool OIsCaptionTop { get; set; } = true;
+    private bool OIsStriped { get; set; } = true;
+    private AlignRow OTRAlignRow { get; set; }
+    private BSColor OTRColor { get; set; } = BSColor.Default;
+    private bool OTRIsActive { get; set; }
+    private AlignRow OAlignRow { get; set; }
+    private BSColor OTDColor { get; set; } = BSColor.Default;
+    private bool OIsActive { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        materias = await materiaService.ListarMateriasAsync();
+    }
+
+    private async Task RegistrarMateria()
+    {
+        try
+        {
+            await materiaService.RegistrarMateriaAsync(model);
+            blazorStrap.Toaster.Add("¡Materia registrada exitosamente!", options => options.CloseAfter = 5000);
+            materias = await materiaService.ListarMateriasAsync();
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al registrar la materia: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task DeleteMateria(int id)
+    {
+        try
+        {
+            await materiaService.EliminarMateriaAsync(id);
+            materias.RemoveAll(c => c.Id == id);
+
+            blazorStrap.Toaster.Add("Materia eliminada correctamente", o =>
+            {
+                o.Color = BSColor.Danger;
+                o.HasIcon = true;
+                o.CloseAfter = 5000;
+            });
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al eliminar la materia: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+}

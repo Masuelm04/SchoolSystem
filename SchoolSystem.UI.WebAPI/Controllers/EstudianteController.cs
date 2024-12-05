@@ -23,10 +23,31 @@ namespace SchoolSystem.UI.WebAPI.Controllers
             _context = context;
         }
 
+        //[HttpGet("FiltrarEstudiantes")]
+        //public async Task<IActionResult> FiltrarEstudiantes(string? nombre, string? apellido, string? curso)
+        //{
+        //    var query = _context.Estudiantes.AsQueryable();
+
+        //    if (!string.IsNullOrEmpty(nombre))
+        //        query = query.Where(e => e.Nombre.Contains(nombre));
+
+        //    if (!string.IsNullOrEmpty(apellido))
+        //        query = query.Where(e => e.Apellido.Contains(apellido));
+
+        //    if (!string.IsNullOrEmpty(curso))
+        //        query = query.Where(e => e.Curso.Nombre == curso);
+
+        //    var estudiantes = await query.ToListAsync();
+        //    return Ok(estudiantes);
+        //}
+
         [HttpGet("FiltrarEstudiantes")]
-        public async Task<IActionResult> FiltrarEstudiantes(string? nombre, string? apellido, string? curso)
+        public async Task<ActionResult<IEnumerable<EstudianteDTO>>> FiltrarEstudiantes(string? nombre, string? apellido, string? curso)
         {
-            var query = _context.Estudiantes.AsQueryable();
+            var query = _context.Estudiantes
+                .Include(e => e.Curso)
+                .Where(e => !e.Eliminado && e.Curso != null && !e.Curso.Eliminado)
+                .AsQueryable();
 
             if (!string.IsNullOrEmpty(nombre))
                 query = query.Where(e => e.Nombre.Contains(nombre));
@@ -38,7 +59,10 @@ namespace SchoolSystem.UI.WebAPI.Controllers
                 query = query.Where(e => e.Curso.Nombre == curso);
 
             var estudiantes = await query.ToListAsync();
-            return Ok(estudiantes);
+
+            var estudiantesDTOs = _mapper.Map<IEnumerable<EstudianteDTO>>(estudiantes);
+
+            return Ok(estudiantesDTOs);
         }
 
         [HttpGet("ListarEstudiantes")]

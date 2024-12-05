@@ -1,0 +1,144 @@
+﻿<BSToaster />
+@page "/estadosAsistencia"
+@using SchoolSystem.Core.DTOs.EstadoAsistencia
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject EstadoAsistenciaService estadoAsistenciaService
+
+<h2 class="text-center">ESTADOS DE ASISTENCIA</h2>
+
+@if (estados == null)
+{
+    <p class="text-center text-primary">LOADING...</p>
+}
+else
+{
+    <BSButton Color="BlazorStrap.BSColor.Success" Target="modalRegistrarEstado">Registrar Nuevo Estado de Asistencia</BSButton>
+
+    <BSTable class="table-responsive-lg" Color="OTableColor" IsResponsive="OIsResponsive" IsBordered="OIsBordered" IsBorderLess="OIsBorderLess" IsCaptionTop="OIsCaptionTop" IsStriped="OIsStriped">
+        <caption class="text-black">Lista de Estados de Asistencia</caption>
+        <BSTHead>
+            <BSTR>
+                <BSTD>Id</BSTD>
+                <BSTD>Estado</BSTD>
+                <BSTD>Descripción</BSTD>
+                <BSTD>Acciones</BSTD>
+            </BSTR>
+        </BSTHead>
+        <BSTBody>
+            @foreach (var estado in estados)
+            {
+                <BSTR>
+                    <BSTD AlignRow="OAlignRow" Color="OTDColor" IsActive="OIsActive">@estado.Id</BSTD>
+                    <BSTD>@estado.Nombre</BSTD>
+                    <BSTD>@estado.Descripcion</BSTD>
+                    <BSTD>
+                        <BSButton Color="BlazorStrap.BSColor.Primary" Target="modalEditarCalificacion">Editar</BSButton>
+                        <BSButton Color="BlazorStrap.BSColor.Danger" Target="modalEliminarEstado">Eliminar</BSButton>
+                    </BSTD>
+                </BSTR>
+
+                @* Modal para confirmar la eliminación de un estado de asistencia *@
+
+                <BSModal DataId="modalEliminarEstado" >
+                    <Header>ELIMINAR ESTADO ASISTENCIA</Header>
+                    <Content>Estás seguro de eliminar este registro?</Content>
+                    <Footer Context="modal">
+                        <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="@(() => modal.HideAsync(false))">Cancelar</BSButton>
+                        <BSButton Color="BSColor.Danger" @onclick="() => DeleteEstado(estado.Id)">Eliminar</BSButton>
+                    </Footer>
+                </BSModal>
+            }
+        </BSTBody>
+    </BSTable>
+
+    @* Modal para registrar estado de asistencia *@
+
+    <BSModal DataId="modalRegistrarEstado" HideOnValidSubmit="true" IsStaticBackdrop="true">
+        <BSForm Model="model" OnValidSubmit="@RegistrarEstado">
+            <DataAnnotationsValidator />
+            <BSModalHeader>Registrar Calificación</BSModalHeader>
+            <BSModalContent>
+                <BSValidationSummary />
+
+                <div class="mb-3">
+                    <BSLabel>Estado</BSLabel>
+                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Nombre" />
+                    <BSFeedback For="@(() => model.Nombre)" />
+                </div>
+
+                <div class="mb-3">
+                    <BSLabel>Descripción</BSLabel>
+                    <BSInput InputType="InputType.TextArea" TValue="string" @bind-value="model.Descripcion" />
+                    <BSFeedback For="@(() => model.Descripcion)" />
+                </div>
+
+            </BSModalContent>
+            <BSModalFooter>
+                <BSButton Target="modalRegistrarEstado">Cancelar</BSButton>
+                <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
+            </BSModalFooter>
+        </BSForm>
+    </BSModal>
+}
+
+@code{
+    private List<EstadoAsistenciaDTO> estados;
+    private ModEstadoAsistenciaDTO model = new ModEstadoAsistenciaDTO();
+
+    private BSColor OTableColor { get; set; } = BSColor.Default;
+    private bool OIsResponsive { get; set; } = true;
+    private bool OIsBordered { get; set; }
+    private bool OIsBorderLess { get; set; }
+    private bool OIsCaptionTop { get; set; } = true;
+    private bool OIsStriped { get; set; } = true;
+    private AlignRow OTRAlignRow { get; set; }
+    private BSColor OTRColor { get; set; } = BSColor.Default;
+    private bool OTRIsActive { get; set; }
+    private AlignRow OAlignRow { get; set; }
+    private BSColor OTDColor { get; set; } = BSColor.Default;
+    private bool OIsActive { get; set; }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        estados = await estadoAsistenciaService.ListarEstadosAsistenciaAsync();
+    }
+
+    private async Task RegistrarEstado()
+    {
+        try
+        {
+            await estadoAsistenciaService.RegistrarEstadoAsistenciaAsync(model);
+            blazorStrap.Toaster.Add("¡Estado registrado exitosamente!", options => options.CloseAfter = 5000);
+            estados = await estadoAsistenciaService.ListarEstadosAsistenciaAsync();
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al registrar el estado: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task DeleteEstado(int id)
+    {
+        try
+        {
+            await estadoAsistenciaService.EliminarEstadoAsistenciaAsync(id);
+            estados.RemoveAll(c => c.Id == id);
+
+            blazorStrap.Toaster.Add("Estado de asistencia eliminado correctamente", o =>
+            {
+                o.Color = BSColor.Danger;
+                o.HasIcon = true;
+                o.CloseAfter = 500;
+            });
+
+            estados = await estadoAsistenciaService.ListarEstadosAsistenciaAsync();
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al eliminar el estado: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+}

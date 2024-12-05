@@ -1,0 +1,209 @@
+﻿<BSToaster />
+@page "/estudiantes"
+@using SchoolSystem.Core.DTOs.Estudiante
+@using SchoolSystem.Core.DTOs.Curso
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject EstudianteService estudianteService
+@inject CursoService cursoService
+
+<h2 class="text-center">ESTUDIANTES</h2>
+
+@if (estudiantes == null)
+{
+    <p class="text-center text-primary">LOADING...</p>
+}
+else
+{
+    <BSButton Color="BlazorStrap.BSColor.Success" Target="modalRegistrarEstudiante">Registrar Nuevo Estudiante</BSButton>
+
+    <div class="mb-3 mt-3">
+        <div class="row">
+            <div class="col-md-3">
+                <BSInput InputType="InputType.Text" TValue="string" @bind-value="filtroNombre" Placeholder="Filtrar por Nombre" />
+            </div>
+            <div class="col-md-3">
+                <BSInput InputType="InputType.Text" TValue="string" @bind-value="filtroApellido" Placeholder="Filtrar por Apellido" />
+            </div>
+            <div class="col-md-3">
+                <BSInput InputType="InputType.Text" TValue="string" @bind-value="filtroCurso" Placeholder="Filtrar por Curso" />
+            </div>
+            <div class="col-md-3">
+                <BSButton Color="BSColor.Primary" @onclick="FiltrarEstudiantes">Buscar</BSButton>
+            </div>
+        </div>
+    </div>
+
+    <BSTable class="table-responsive-lg" Color="OTableColor" IsResponsive="OIsResponsive" IsBordered="OIsBordered" IsBorderLess="OIsBorderLess" IsCaptionTop="OIsCaptionTop" IsStriped="OIsStriped">
+        <caption class="text-black">Lista de Calificaciones</caption>
+        <BSTHead>
+            <BSTR>
+                <BSTD>Id</BSTD>
+                <BSTD>Nombre</BSTD>
+                <BSTD>Apellido</BSTD>
+                <BSTD>Fecha Nacimiento</BSTD>
+                <BSTD>Dirección</BSTD>
+                <BSTD>Curso</BSTD>
+                <BSTD>Acciones</BSTD>
+            </BSTR>
+        </BSTHead>
+        <BSTBody>
+            @foreach (var estudiante in estudiantes)
+            {
+                <BSTR>
+                    <BSTD AlignRow="OAlignRow" Color="OTDColor" IsActive="OIsActive">@estudiante.Id</BSTD>
+                    <BSTD>@estudiante.Nombre</BSTD>
+                    <BSTD>@estudiante.Apellido</BSTD>
+                    <BSTD>@estudiante.FechaNacimiento.ToString("dd/MM/yyyy")</BSTD>
+                    <BSTD>@estudiante.Direccion</BSTD>
+                    <BSTD>@estudiante.NombreCurso</BSTD>
+                    <BSTD>
+                        <BSButton Color="BlazorStrap.BSColor.Primary" Target="modalEditarCalificacion">Editar</BSButton>
+                        <BSButton Color="BlazorStrap.BSColor.Danger" @onclick="() => DeleteEstudiante(estudiante.Id)">Eliminar</BSButton>
+                    </BSTD>
+                </BSTR>
+            }
+        </BSTBody>
+    </BSTable>
+
+    @* Modal para registrar estudiante *@
+
+    <BSModal DataId="modalRegistrarEstudiante" OnShow="@CargarDatosParaListar" HideOnValidSubmit="true" IsStaticBackdrop="true">
+        <BSForm Model="model" OnValidSubmit="@RegistrarEstudiante">
+            <DataAnnotationsValidator />
+            <BSModalHeader>Registrar Estudiante</BSModalHeader>
+            <BSModalContent>
+                <BSValidationSummary />
+
+                <div class="mb-3">
+                    <BSLabel>Nombre</BSLabel>
+                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Nombre" />
+                    <BSFeedback For="@(() => model.Nombre)" />
+                </div>
+
+                <div class="mb-3">
+                    <BSLabel>Apellido</BSLabel>
+                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Apellido" />
+                    <BSFeedback For="@(() => model.Apellido)" />
+                </div>
+
+                <div class="mb-3">
+                    <BSLabel>Fecha Nacimiento</BSLabel>
+                    <BSInput InputType="InputType.Date" TValue="DateTime" @bind-value="model.FechaNacimiento" />
+                    <BSFeedback For="@(() => model.FechaNacimiento)" />
+                </div>
+
+                <div class="mb-3">
+                    <BSLabel>Dirección</BSLabel>
+                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Direccion" />
+                    <BSFeedback For="@(() => model.Direccion)" />
+                </div>
+
+                <div class="mb-3">
+                    <BSLabel>Curso</BSLabel>
+                    <BSInput InputType="InputType.Select" TValue="int" @bind-value="model.IdCurso">
+                        <option value="">Seleccione un curso</option>
+                        @foreach (var curso in Cursos)
+                        {
+                            <option value="@curso.Id">@curso.Nombre</option>
+                        }
+                    </BSInput>
+                    <BSFeedback For="@(() => model.IdCurso)" />
+                </div>
+
+            </BSModalContent>
+            <BSModalFooter>
+                <BSButton Target="modalRegistrarEstudiante">Cancelar</BSButton>
+                <BSButton IsSubmit="true" Color="BSColor.Primary">Registrar</BSButton>
+            </BSModalFooter>
+        </BSForm>
+    </BSModal>
+}
+
+@code {
+    private List<EstudianteDTO> estudiantes;
+    private EstudianteDTO estudiante;
+    private ModEstudianteDTO model = new ModEstudianteDTO();
+    private List<CursoDTO> Cursos = new List<CursoDTO>();
+    private string filtroNombre = string.Empty;
+    private string filtroApellido = string.Empty;
+    private string filtroCurso = string.Empty;
+
+    private BSColor OTableColor { get; set; } = BSColor.Default;
+    private bool OIsResponsive { get; set; } = true;
+    private bool OIsBordered { get; set; }
+    private bool OIsBorderLess { get; set; }
+    private bool OIsCaptionTop { get; set; } = true;
+    private bool OIsStriped { get; set; } = true;
+    private AlignRow OTRAlignRow { get; set; }
+    private BSColor OTRColor { get; set; } = BSColor.Default;
+    private bool OTRIsActive { get; set; }
+    private AlignRow OAlignRow { get; set; }
+    private BSColor OTDColor { get; set; } = BSColor.Default;
+    private bool OIsActive { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        estudiantes = await estudianteService.ListarEstudiantesAsync();
+    }
+
+    private async Task CargarDatosParaListar()
+    {
+        try
+        {
+            Cursos = await cursoService.ListarCursosAsync();
+            model.FechaNacimiento = DateTime.Now;
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al cargar datos: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task FiltrarEstudiantes()
+    {
+        try
+        {
+            estudiantes = await estudianteService.FiltrarEstudiantesAsync(filtroNombre, filtroApellido, filtroCurso);
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al filtrar estudiantes: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task RegistrarEstudiante()
+    {
+        try
+        {
+            await estudianteService.RegistrarEstudianteAsync(model);
+            blazorStrap.Toaster.Add("¡Estudiante registrado exitosamente!", options => options.CloseAfter = 5000);
+            estudiantes = await estudianteService.ListarEstudiantesAsync();
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al registrar el estudiante: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task DeleteEstudiante(int id)
+    {
+        try
+        {
+            await estudianteService.EliminarEstudianteAsync(id);
+            estudiantes.RemoveAll(c => c.Id == id);
+
+            blazorStrap.Toaster.Add("Estudiante eliminado correctamente", o =>
+            {
+                o.Color = BSColor.Danger;
+                o.HasIcon = true;
+                o.CloseAfter = 5000;
+            });
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al eliminar el estudiante: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+}
