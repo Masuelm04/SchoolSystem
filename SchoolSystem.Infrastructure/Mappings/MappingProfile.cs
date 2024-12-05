@@ -34,11 +34,12 @@ namespace SchoolSystem.Infrastructure.Mappings
             //Calificacion
             CreateMap<Calificacion, CalificacionDTO>().
                 ForMember(d => d.NombreEstudiante, o => o.MapFrom(c => c.Estudiante.Nombre)).
+                ForMember(d => d.IdMateria, o => o.MapFrom(c => c.IdMateria)).
                 ForMember(d => d.NombreMateria, o => o.MapFrom(c => c.Materia.Nombre)).ReverseMap();
             CreateMap<ModCalificacionDTO, Calificacion>();
             CreateMap<Calificacion, CalificacionResponseDTO>();
 
-            
+
             //Curso
             CreateMap<Curso, CursoMateriaDTO>().
                 ForMember(d => d.Materias, o => o.MapFrom(c => c.CursoMaterias.Select(cm => cm.Materia))).ReverseMap();

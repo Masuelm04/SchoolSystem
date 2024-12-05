@@ -23,6 +23,7 @@ namespace SchoolSystem.Core.DTOs.Calificacion
         }
         public int IdEstudiante { get; set; }
         public string NombreEstudiante { get; set; }
+        public int IdMateria { get; set; }
         public string NombreMateria { get; set; }
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
         public DateTime FechaRegistro { get; set; }

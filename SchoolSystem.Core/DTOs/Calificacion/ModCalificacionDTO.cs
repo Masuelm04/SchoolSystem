@@ -8,6 +8,7 @@ namespace SchoolSystem.Core.DTOs.Calificacion
 {
     public class ModCalificacionDTO
     {
+        public int Id { get; set; }
         public int Nota { get; set; }
         public string Literal
         {

@@ -1,0 +1,241 @@
+﻿<BSToaster />
+@page "/asistencias"
+@using SchoolSystem.Core.DTOs.Asistencia
+@using SchoolSystem.Core.DTOs.Estudiante
+@using SchoolSystem.Core.DTOs.EstadoAsistencia
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject AsistenciaService asistenciaService
+@inject EstudianteService estudianteService
+@inject EstadoAsistenciaService estadoAsistenciaService
+
+<h2 class="text-center">ASISTENCIAS</h2>
+
+@if (asistencias == null)
+{
+    <p class="text-center text-primary">LOADING...</p>
+}
+else
+{
+    <div>
+        <BSButton Color="BlazorStrap.BSColor.Success" Target="modalRegistrarAsistencia">Registrar Nueva Asistencia</BSButton>
+
+        <BSButton Color="BlazorStrap.BSColor.Primary" Target="modalHistorialAsistencia">Ver historial de asistencia</BSButton>
+    </div>
+    
+
+    <BSTable class="table-responsive-lg" Color="OTableColor" IsResponsive="OIsResponsive" IsBordered="OIsBordered" IsBorderLess="OIsBorderLess" IsCaptionTop="OIsCaptionTop" IsStriped="OIsStriped">
+        <caption class="text-black">Lista de Asistencias</caption>
+        <BSTHead>
+            <BSTR>
+                <BSTD>Id</BSTD>
+                <BSTD>Estudiante</BSTD>
+                <BSTD>Curso</BSTD>
+                <BSTD>Estado</BSTD>
+                <BSTD>Fecha</BSTD>
+                <BSTD>Acciones</BSTD>
+            </BSTR>
+        </BSTHead>
+        <BSTBody>
+            @foreach (var asistencia in asistencias)
+            {
+                <BSTR>
+                    <BSTD AlignRow="OAlignRow" Color="OTDColor" IsActive="OIsActive">@asistencia.Id</BSTD>
+                    <BSTD>@asistencia.NombreEstudiante</BSTD>
+                    <BSTD>@asistencia.Curso</BSTD>
+                    <BSTD>@asistencia.EstadoAsistencia</BSTD>
+                    <BSTD>@asistencia.Fecha.ToString("dd/MM/yyyy")</BSTD>
+                    <BSTD>
+                        <BSButton Color="BlazorStrap.BSColor.Primary" Target="modalEditarAsistencia">Editar</BSButton>
+                        <BSButton Color="BlazorStrap.BSColor.Danger" @onclick="() => DeleteAsistencia(asistencia.Id)">Eliminar</BSButton>
+                    </BSTD>
+                </BSTR>
+            }
+        </BSTBody>
+    </BSTable>
+
+    @* Modal para ver historial de asistencias*@
+
+    <BSModal DataId="modalHistorialAsistencia" IsStaticBackdrop="true" OnShow="@CargarHistorialAsistenciaModal">
+        <BSModalHeader>Historial de Asistencia</BSModalHeader>
+        <BSModalContent>
+            <div class="mb-3">
+                <BSLabel>Seleccione la fecha</BSLabel>
+                <BSInput InputType="InputType.Date" TValue="DateTime" @bind-value="fechaSeleccionada" />
+            </div>
+
+            <BSButton Color="BlazorStrap.BSColor.Primary" @onclick="ObtenerHistorialAsistencia">Obtener Historial</BSButton>
+
+            @if (historialAsistencia != null)
+            {
+                <BSTable class="table-responsive-lg" Color="OTableColor" IsResponsive="OIsResponsive" IsBordered="OIsBordered" IsBorderLess="OIsBorderLess" IsCaptionTop="OIsCaptionTop" IsStriped="OIsStriped">
+                    <caption class="text-black">Historial de Asistencia para la fecha: @fechaSeleccionada.ToString("dd/MM/yyyy")</caption>
+                    <BSTHead>
+                        <BSTR>
+                            <BSTD>Estudiante</BSTD>
+                            <BSTD>Estado</BSTD>
+                            <BSTD>Curso</BSTD>
+                        </BSTR>
+                    </BSTHead>
+                    <BSTBody>
+                        @foreach (var asistencia in historialAsistencia)
+                        {
+                            <BSTR>
+                                <BSTD>@asistencia.NombreEstudiante</BSTD>
+                                <BSTD>@asistencia.Estado</BSTD>
+                                <BSTD>@asistencia.Curso</BSTD>
+                            </BSTR>
+                        }
+                    </BSTBody>
+                </BSTable>
+            }
+            else
+            {
+                <h4 class="text-center mt-3">No hay registros de asistencia para la fecha: @fechaSeleccionada.ToString("dd/MM/yyyy")</h4>
+            }
+        </BSModalContent>
+        <BSModalFooter>
+            <BSButton Color="BlazorStrap.BSColor.Danger" Target="modalHistorialAsistencia">Cerrar</BSButton>
+        </BSModalFooter>
+    </BSModal>
+
+    @* Modal para registrar asistencia *@
+
+    <BSModal DataId="modalRegistrarAsistencia" OnShow="@CargarDatosParaListar" HideOnValidSubmit="true" IsStaticBackdrop="true">
+        <BSForm Model="model" OnValidSubmit="@RegistrarAsistencia">
+            <DataAnnotationsValidator />
+            <BSModalHeader>Registrar Asistencia</BSModalHeader>
+            <BSModalContent>
+                <BSValidationSummary />
+
+                <div class="mb-3">
+                    <BSLabel>Fecha</BSLabel>
+                    <BSInput InputType="InputType.Date" TValue="DateTime" @bind-value="model.Fecha" />
+                </div>
+
+                <div class="mb-3">
+                    <BSLabel>Estudiante</BSLabel>
+                    <BSInput InputType="InputType.Select" TValue="int" @bind-value="model.IdEstudiante">
+                        <option value="">Seleccione un curso</option>
+                        @foreach (var estudiante in Estudiantes)
+                        {
+                            <option value="@estudiante.Id">@($"{estudiante.Nombre} {estudiante.Apellido} - {estudiante.NombreCurso}")</option>
+                        }
+                    </BSInput>
+                    <BSFeedback For="@(() => model.IdEstudiante)" />
+                </div>
+
+                <div class="mb-3">
+                    <BSLabel>Estado</BSLabel>
+                    <BSInput InputType="InputType.Select" TValue="int" @bind-value="model.IdEstadoAsistencia">
+                        <option value="">Seleccione un curso</option>
+                        @foreach (var estado in Estados)
+                        {
+                            <option value="@estado.Id">@estado.Nombre</option>
+                        }
+                    </BSInput>
+                    <BSFeedback For="@(() => model.IdEstadoAsistencia)" />
+                </div>
+
+            </BSModalContent>
+            <BSModalFooter>
+                <BSButton Target="modalRegistrarEstudiante">Cancelar</BSButton>
+                <BSButton IsSubmit="true" Color="BSColor.Primary">Registrar</BSButton>
+            </BSModalFooter>
+        </BSForm>
+    </BSModal>
+}
+
+@code {
+    private List<AsistenciaDTO> asistencias;
+    private AsistenciaDTO asistencia;
+    private ModAsistenciaDTO model = new ModAsistenciaDTO();
+    private List<EstudianteDTO> Estudiantes = new List<EstudianteDTO>();
+    private List<EstadoAsistenciaDTO> Estados = new List<EstadoAsistenciaDTO>();
+    private List<HistorialAsistenciaDTO> historialAsistencia;
+    private DateTime fechaSeleccionada = DateTime.Today;
+
+    private BSColor OTableColor { get; set; } = BSColor.Default;
+    private bool OIsResponsive { get; set; } = true;
+    private bool OIsBordered { get; set; }
+    private bool OIsBorderLess { get; set; }
+    private bool OIsCaptionTop { get; set; } = true;
+    private bool OIsStriped { get; set; } = true;
+    private AlignRow OTRAlignRow { get; set; }
+    private BSColor OTRColor { get; set; } = BSColor.Default;
+    private bool OTRIsActive { get; set; }
+    private AlignRow OAlignRow { get; set; }
+    private BSColor OTDColor { get; set; } = BSColor.Default;
+    private bool OIsActive { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        asistencias = await asistenciaService.ListarAsistenciasAsync();
+    }
+
+    private async Task CargarDatosParaListar()
+    {
+        try
+        {
+            Estudiantes = await estudianteService.ListarEstudiantesAsync();
+            Estados = await estadoAsistenciaService.ListarEstadosAsistenciaAsync();
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al cargar datos: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task RegistrarAsistencia()
+    {
+        try
+        {
+            await asistenciaService.RegistrarAsistenciaAsync(model);
+            blazorStrap.Toaster.Add("¡Asistencia registrada exitosamente!", options => options.CloseAfter = 5000);
+            asistencias = await asistenciaService.ListarAsistenciasAsync();
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al registrar la asistencia: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task DeleteAsistencia(int id)
+    {
+        try
+        {
+            await asistenciaService.EliminarAsistenciaAsync(id);
+            asistencias.RemoveAll(c => c.Id == id);
+
+            blazorStrap.Toaster.Add("Asistencia eliminada correctamente", o =>
+            {
+                o.Color = BSColor.Danger;
+                o.HasIcon = true;
+                o.CloseAfter = 5000;
+            });
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al eliminar la asistencia: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task ObtenerHistorialAsistencia()
+    {
+        try
+        {
+            historialAsistencia = await asistenciaService.ObtenerHistorialAsistenciaPorFechaAsync(fechaSeleccionada);
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al cargar el historial de asistencia: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private Task CargarHistorialAsistenciaModal()
+    {
+        historialAsistencia = null; 
+        return Task.CompletedTask;
+    }
+}

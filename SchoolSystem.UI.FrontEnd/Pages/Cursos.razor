@@ -1,0 +1,133 @@
+﻿<BSToaster />
+@page "/cursos"
+@using SchoolSystem.Core.DTOs.Curso
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject CursoService cursoService
+
+<h2 class="text-center">CURSOS</h2>
+
+@if (cursos == null)
+{
+    <p class="text-center text-primary">LOADING...</p>
+}
+else
+{
+    <BSButton Color="BlazorStrap.BSColor.Success" Target="modalRegistrarCurso">Registrar Nuevo Curso</BSButton>
+
+    <BSTable class="table-responsive-lg" Color="OTableColor" IsResponsive="OIsResponsive" IsBordered="OIsBordered" IsBorderLess="OIsBorderLess" IsCaptionTop="OIsCaptionTop" IsStriped="OIsStriped">
+        <caption class="text-black">Lista de Cursos</caption>
+        <BSTHead>
+            <BSTR>
+                <BSTD>Id</BSTD>
+                <BSTD>Curso</BSTD>
+                <BSTD>Acciones</BSTD>
+            </BSTR>
+        </BSTHead>
+        <BSTBody>
+            @foreach (var curso in cursos)
+            {
+                <BSTR>
+                    <BSTD AlignRow="OAlignRow" Color="OTDColor" IsActive="OIsActive">@curso.Id</BSTD>
+                    <BSTD>@curso.Nombre</BSTD>
+                    <BSTD>
+                        <BSButton Color="BlazorStrap.BSColor.Primary" Target="modalEditarCurso">Editar</BSButton>
+                        <BSButton Color="BlazorStrap.BSColor.Danger" Target="modalEliminarCurso">Eliminar</BSButton>
+                    </BSTD>
+                </BSTR>
+
+                @* Modal para confirmar la eliminación de curso *@
+
+                <BSModal DataId="modalEliminarCurso" IsStaticBackdrop="false">
+                    <Header>ELIMINAR CURSO</Header>
+                    <Content>Estás seguro de eliminar este registro?</Content>
+                    <Footer Context="modal">
+                        <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="@(() => modal.HideAsync(false))">Cancelar</BSButton>
+                        <BSButton Color="BSColor.Danger" @onclick="() => DeleteCurso(curso.Id)">Eliminar</BSButton>
+                    </Footer>
+                </BSModal>
+            }
+        </BSTBody>
+    </BSTable>
+
+    @* Modal para registrar curso *@
+
+    <BSModal DataId="modalRegistrarCurso" HideOnValidSubmit="true" IsStaticBackdrop="true">
+        <BSForm Model="model" OnValidSubmit="@RegistrarCurso">
+            <DataAnnotationsValidator />
+            <BSModalHeader>Registrar Curso</BSModalHeader>
+            <BSModalContent>
+                <BSValidationSummary />
+
+                <div class="mb-3">
+                    <BSLabel>Curso</BSLabel>
+                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Nombre" />
+                    <BSFeedback For="@(() => model.Nombre)" />
+                </div>
+
+            </BSModalContent>
+            <BSModalFooter>
+                <BSButton Target="modalRegistrarCurso">Cancelar</BSButton>
+                <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
+            </BSModalFooter>
+        </BSForm>
+    </BSModal>
+}
+
+@code {
+    private List<CursoDTO> cursos;
+    private ModCursoDTO model = new ModCursoDTO();
+
+    private BSColor OTableColor { get; set; } = BSColor.Default;
+    private bool OIsResponsive { get; set; } = true;
+    private bool OIsBordered { get; set; }
+    private bool OIsBorderLess { get; set; }
+    private bool OIsCaptionTop { get; set; } = true;
+    private bool OIsStriped { get; set; } = true;
+    private AlignRow OTRAlignRow { get; set; }
+    private BSColor OTRColor { get; set; } = BSColor.Default;
+    private bool OTRIsActive { get; set; }
+    private AlignRow OAlignRow { get; set; }
+    private BSColor OTDColor { get; set; } = BSColor.Default;
+    private bool OIsActive { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        cursos = await cursoService.ListarCursosAsync();
+    }
+
+    private async Task RegistrarCurso()
+    {
+        try
+        {
+            await cursoService.RegistrarCursoAsync(model);
+            blazorStrap.Toaster.Add("¡Curso registrada exitosamente!", options => options.CloseAfter = 5000);
+            cursos = await cursoService.ListarCursosAsync();
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al registrar el curso: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task DeleteCurso(int id)
+    {
+        try
+        {
+            await cursoService.EliminarCursoAsync(id);
+            cursos.RemoveAll(c => c.Id == id);
+
+            blazorStrap.Toaster.Add("Curso eliminado correctamente", o =>
+            {
+                o.Color = BSColor.Danger;
+                o.HasIcon = true;
+                o.CloseAfter = 5000;
+            });
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al eliminar el curso: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+}

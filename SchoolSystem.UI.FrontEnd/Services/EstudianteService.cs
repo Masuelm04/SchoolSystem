@@ -116,19 +116,55 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<List<EstudianteDTO>> FiltrarEstudiantesAsync(string nombre, string apellido, string curso)
+        public async Task<List<EstudianteDTO>> FiltrarEstudiantesAsync(string? nombre, string? apellido, string? curso)
         {
             try
             {
-                var url = $"api/Estudiantes/FiltrarEstudiantes?nombre={nombre}&apellido={apellido}&curso={curso}";
-                var estudiantes = await _httpClient.GetFromJsonAsync<List<EstudianteDTO>>(url);
+                var queryParams = new List<string>();
 
-                return estudiantes;
+                if (!string.IsNullOrEmpty(nombre))
+                    queryParams.Add($"nombre={Uri.EscapeDataString(nombre)}");
+
+                if (!string.IsNullOrEmpty(apellido))
+                    queryParams.Add($"apellido={Uri.EscapeDataString(apellido)}");
+
+                if (!string.IsNullOrEmpty(curso))
+                    queryParams.Add($"curso={Uri.EscapeDataString(curso)}");
+
+                var queryString = string.Join("&", queryParams);
+                var url = $"api/Estudiantes/FiltrarEstudiantes?{queryString}";
+
+                var response = await _httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var estudiantes = await response.Content.ReadFromJsonAsync<List<EstudianteDTO>>();
+                    return estudiantes ?? new List<EstudianteDTO>();
+                }
+                else
+                {
+                    throw new ApplicationException($"Error en el servidor: {response.StatusCode}");
+                }
             }
             catch (Exception ex)
             {
                 throw new ApplicationException("Error al filtrar los estudiantes.", ex);
             }
         }
+
+        //public async Task<List<EstudianteDTO>> FiltrarEstudiantesAsync(string nombre, string apellido, string curso)
+        //{
+        //    try
+        //    {
+        //        var url = $"api/Estudiantes/FiltrarEstudiantes?nombre={nombre}&apellido={apellido}&curso={curso}";
+        //        var estudiantes = await _httpClient.GetFromJsonAsync<List<EstudianteDTO>>(url);
+
+        //        return estudiantes;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new ApplicationException("Error al filtrar los estudiantes.", ex);
+        //    }
+        //}
     }
 }
