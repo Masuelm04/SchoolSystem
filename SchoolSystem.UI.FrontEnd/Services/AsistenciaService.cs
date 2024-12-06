@@ -81,7 +81,6 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PostAsJsonAsync("api/Asistencias/RegistrarAsistencia", nuevaAsistencia);
                 response.EnsureSuccessStatusCode();
-                //return await response.Content.ReadFromJsonAsync<AsistenciaDTO>();
             }
             catch (Exception ex)
             {
@@ -102,7 +101,6 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PutAsJsonAsync($"api/Asistencias/EditarAsistencia/{id}", asistenciaActualizada);
                 response.EnsureSuccessStatusCode();
-                //return await response.Content.ReadFromJsonAsync<AsistenciaResponseDTO>();
             }
             catch (Exception ex)
             {
