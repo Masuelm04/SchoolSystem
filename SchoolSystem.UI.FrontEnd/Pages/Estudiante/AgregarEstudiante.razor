@@ -1,0 +1,96 @@
+﻿<BSToaster />
+@page "/estudiantes/agregarestudiante"
+@using SchoolSystem.Core.DTOs.Estudiante
+@using SchoolSystem.Core.DTOs.Curso
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject EstudianteService estudianteService
+@inject CursoService cursoService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<EditForm Model="estudiante" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <div class="mb-3">
+            <BSButton Color="BSColor.Secondary" @onclick="Volver">Volver</BSButton>
+        </div>
+
+        <div class="mb-3 text-center">
+            <h2>REGISTRAR ESTUDIANTE</h2>
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Nombre</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="estudiante.Nombre" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Apellido</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="estudiante.Apellido" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Fecha Nacimiento</BSLabel>
+            <BSInput InputType="InputType.Date" TValue="DateTime" @bind-value="estudiante.FechaNacimiento" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Direccion</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="estudiante.Direccion" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Curso</BSLabel>
+            @if (Cursos != null && Cursos.Any())
+            {
+                <BSInput InputType="InputType.Select" TValue="int" @bind-value="estudiante.IdCurso">
+                    <option value="">Seleccione un estudiante</option>
+                    @foreach (var curso in Cursos)
+                    {
+                        <option value="@curso.Id">@($"{curso.Nombre}")</option>
+                    }
+                </BSInput>
+                <BSFeedback For="@(() => estudiante.IdCurso)" />
+            }
+            else
+            {
+                <p>No hay cursos disponibles</p>
+            }
+
+        </div>
+
+        <div class="mb-3 text-center">
+            <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    private EstudianteDTO estudiante = new EstudianteDTO()
+        {
+            IdCurso = 0,
+            FechaNacimiento = DateTime.Today
+        };
+    private List<CursoDTO> Cursos = new List<CursoDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Cursos = await cursoService.ListarCursosAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await estudianteService.RegistrarEstudianteAsync(estudiante);
+        navigation.NavigateTo("/estudiantes");
+    }
+
+    private void Volver()
+    {
+        navigation.NavigateTo("/estudiantes");
+    }
+}

@@ -26,6 +26,7 @@ namespace SchoolSystem.Infrastructure.Repositories
                                   .Include(a => a.Estudiante) 
                                   .Include(a => a.Estado)
                                   .Include(a => a.Estudiante.Curso)
+                                  .OrderBy(a => a.Estudiante.Curso.Nombre)
                                   .ToListAsync();
 
             return historial;

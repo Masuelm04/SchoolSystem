@@ -1,0 +1,110 @@
+﻿<BSToaster />
+@page "/estudiantes/edit/{id:int}"
+@using SchoolSystem.Core.DTOs.Estudiante
+@using SchoolSystem.Core.DTOs.Curso
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject EstudianteService estudianteService
+@inject CursoService cursoService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<EditForm Model="estudiante" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <div class="mb-3">
+            <BSButton Color="BSColor.Secondary" @onclick="Volver">Volver</BSButton>
+        </div>
+
+        <div class="mb-3 text-center">
+            <h2>EDITAR ESTUDIANTE</h2>
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Nombre</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="estudiante.Nombre" IsDisabled="true" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Apellido</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="estudiante.Apellido" IsDisabled="true" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Fecha Nacimiento</BSLabel>
+            <BSInput InputType="InputType.Date" TValue="DateTime" @bind-value="estudiante.FechaNacimiento" IsDisabled="true" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Direccion</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="estudiante.Direccion" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Curso</BSLabel>
+            @if (Cursos != null && Cursos.Any())
+            {
+                <BSInput InputType="InputType.Select" TValue="int" @bind-value="estudiante.IdCurso" >
+                    <option value="">Seleccione un estudiante</option>
+                    @foreach (var curso in Cursos)
+                    {
+                        <option value="@curso.Id">@($"{curso.Nombre}")</option>
+                    }
+                </BSInput>
+                <BSFeedback For="@(() => estudiante.IdCurso)" />
+            }
+            else
+            {
+                <p>No hay cursos disponibles</p>
+            }
+
+        </div>
+
+        <div class="mb-3 text-center">
+            <BSButton IsSubmit="true" Color="BSColor.Primary">Editar</BSButton>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    private EstudianteDTO estudiante = new EstudianteDTO();
+    private List<CursoDTO> Cursos = new List<CursoDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            Cursos = await cursoService.ListarCursosAsync();
+
+            estudiante = await estudianteService.ObtenerEstudiantePorIdAsync(id);
+
+            if (estudiante == null)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Estudiante no encontrado.");
+                navigation.NavigateTo("/estudiantes");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al cargar datos: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await estudianteService.EditarEstudianteAsync(id, estudiante);
+        navigation.NavigateTo("/estudiantes");
+    }
+
+    private void Volver()
+    {
+        navigation.NavigateTo("/estudiantes");
+    }
+}
