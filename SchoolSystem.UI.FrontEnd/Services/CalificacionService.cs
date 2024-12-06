@@ -49,7 +49,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<CalificacionDTO> RegistrarCalificacionAsync(ModCalificacionDTO nuevaCalificacion)
+        public async Task RegistrarCalificacionAsync(CalificacionDTO nuevaCalificacion)
         {
             ValidarCalificacion(nuevaCalificacion);
 
@@ -57,7 +57,6 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PostAsJsonAsync("api/Calificaciones/RegistrarCalificacion", nuevaCalificacion);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<CalificacionDTO>();
             }
             catch (Exception ex)
             {
@@ -65,7 +64,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<CalificacionResponseDTO> EditarCalificacionAsync(int id, ModCalificacionDTO calificacionActualizada)
+        public async Task EditarCalificacionAsync(int id, CalificacionDTO calificacionActualizada)
         {
             if (id <= 0)
             {
@@ -78,7 +77,6 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PutAsJsonAsync($"api/Calificaciones/EditarCalificacion/{id}", calificacionActualizada);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<CalificacionResponseDTO>();
             }
             catch (Exception ex)
             {
@@ -104,7 +102,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        private void ValidarCalificacion(ModCalificacionDTO calificacion)
+        private void ValidarCalificacion(CalificacionDTO calificacion)
         {
             if (calificacion == null)
             {

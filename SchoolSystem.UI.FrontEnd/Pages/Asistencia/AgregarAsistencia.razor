@@ -1,0 +1,106 @@
+﻿<BSToaster />
+@page "/asistencias/agregarasistencia"
+@using SchoolSystem.Core.DTOs.Asistencia
+@using SchoolSystem.Core.DTOs.Estudiante
+@using SchoolSystem.Core.DTOs.EstadoAsistencia
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject AsistenciaService asistenciaService
+@inject EstudianteService estudianteService
+@inject EstadoAsistenciaService estadoAsistenciaService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<EditForm Model="asistencia" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <div class="mb-3">
+            <BSButton Color="BSColor.Secondary" @onclick="Volver">Volver</BSButton>
+        </div>
+
+        <div class="mb-3 text-center">
+            <h2>REGISTRAR ASISTENCIA</h2>
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Fecha</BSLabel>
+            <BSInput InputType="InputType.Date" TValue="DateTime" @bind-value="asistencia.Fecha" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Estudiante</BSLabel>
+            @if (Estudiantes != null && Estudiantes.Any())
+            {
+                <BSInput InputType="InputType.Select" TValue="int" @bind-value="asistencia.IdEstudiante" >
+                    <option value="">Seleccione un estudiante</option>
+                    @foreach (var estudiante in Estudiantes)
+                    {
+                        <option value="@estudiante.Id">@($"{estudiante.Nombre} {estudiante.Apellido} - {estudiante.NombreCurso}")</option>
+                    }
+                </BSInput>
+                <BSFeedback For="@(() => asistencia.IdEstudiante)" />
+            }
+            else
+            {
+                <p>No hay estudiantes disponibles</p>
+            }
+
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Estado</BSLabel>
+            @if (Estados != null && Estados.Any())
+            {
+                <BSInput InputType="InputType.Select" TValue="int" @bind-value="asistencia.IdEstadoAsistencia">
+                    <option value="">Seleccione un estado</option>
+                    @foreach (var estado in Estados)
+                    {
+                        <option value="@estado.Id">@($"{estado.Nombre}")</option>
+                    }
+                </BSInput>
+                <BSFeedback For="@(() => asistencia.IdEstadoAsistencia)" />
+            }
+            else
+            {
+                <p>No hay estados disponibles</p>
+            }
+
+        </div>
+
+        <div class="mb-3 text-center">
+            <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    private AsistenciaDTO asistencia = new AsistenciaDTO()
+    {
+            IdEstadoAsistencia = 0,
+            IdEstudiante = 0
+            
+    };
+    private List<EstudianteDTO> Estudiantes = new List<EstudianteDTO>();
+    private List<EstadoAsistenciaDTO> Estados = new List<EstadoAsistenciaDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Estudiantes = await estudianteService.ListarEstudiantesAsync();
+        Estados = await estadoAsistenciaService.ListarEstadosAsistenciaAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await asistenciaService.RegistrarAsistenciaAsync(asistencia);
+        navigation.NavigateTo("/asistencias");
+    }
+
+    private void Volver()
+    {
+        navigation.NavigateTo("/asistencias");
+    }
+}

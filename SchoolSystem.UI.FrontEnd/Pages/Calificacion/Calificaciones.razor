@@ -1,0 +1,126 @@
+﻿<BSToaster />
+@page "/calificaciones"
+@using SchoolSystem.Core.DTOs.Calificacion
+@using SchoolSystem.Core.DTOs.Estudiante
+@using SchoolSystem.Core.DTOs.Materia
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject CalificacionService calificacionService
+@inject EstudianteService estudianteService
+@inject MateriaService materiaService
+@inject NavigationManager navigation
+
+<h2 class="text-center">CALIFICACIONES</h2>
+
+@if (calificaciones == null)
+{
+    <p class="text-center text-primary">LOADING...</p>
+}
+else
+{
+    <BSButton Color="BlazorStrap.BSColor.Success" @onclick="CrearCalificacion">Registrar Nueva Calificación</BSButton>
+
+    <BSTable class="table-responsive-lg" Color="OTableColor" IsResponsive="OIsResponsive" IsBordered="OIsBordered" IsBorderLess="OIsBorderLess" IsCaptionTop="OIsCaptionTop" IsStriped="OIsStriped">
+        <caption class="text-black">Lista de Calificaciones</caption>
+        <BSTHead>
+            <BSTR>
+                <BSTD>Id</BSTD>
+                <BSTD>Estudiante</BSTD>
+                <BSTD>Materia</BSTD>
+                <BSTD>Calificación</BSTD>
+                <BSTD>Literal</BSTD>
+                <BSTD>Acciones</BSTD>
+            </BSTR>
+        </BSTHead>
+        <BSTBody>
+            @foreach (var calificacion in calificaciones)
+            {
+                <BSTR>
+                    <BSTD AlignRow="OAlignRow" Color="OTDColor" IsActive="OIsActive">@calificacion.Id</BSTD>
+                    <BSTD>@calificacion.NombreEstudiante</BSTD>
+                    <BSTD>@calificacion.NombreMateria</BSTD>
+                    <BSTD>@calificacion.Nota</BSTD>
+                    <BSTD>@calificacion.Literal</BSTD>
+                    <BSTD>
+                        <NavLink class="btn btn-primary" href="@GetEditUrl(calificacion.Id)">
+                            <i class="fas fa-edit"></i> Editar
+                        </NavLink>
+                        <BSButton Color="BlazorStrap.BSColor.Danger" @onclick="() => DeleteCalificacion(calificacion.Id)">Eliminar</BSButton>
+                    </BSTD>
+                </BSTR>
+            }
+        </BSTBody>
+    </BSTable>  
+}
+
+@code {
+    private List<CalificacionDTO> calificaciones;
+    private CalificacionDTO calificacion;
+    private List<EstudianteDTO> Estudiantes = new List<EstudianteDTO>();
+    private List<MateriaDTO> Materias = new List<MateriaDTO>();
+
+    private BSColor OTableColor { get; set; } = BSColor.Default;
+    private bool OIsResponsive { get; set; } = true;
+    private bool OIsBordered { get; set; }
+    private bool OIsBorderLess { get; set; }
+    private bool OIsCaptionTop { get; set; } = true;
+    private bool OIsStriped { get; set; } = true;
+    private AlignRow OTRAlignRow { get; set; }
+    private BSColor OTRColor { get; set; } = BSColor.Default;
+    private bool OTRIsActive { get; set; }
+    private AlignRow OAlignRow { get; set; }
+    private BSColor OTDColor { get; set; } = BSColor.Default;
+    private bool OIsActive { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        calificaciones = await calificacionService.ListarCalificacionesAsync();
+    }
+
+    private async Task CargarDatosParaListar()
+    {
+        try
+        {
+            Estudiantes = await estudianteService.ListarEstudiantesAsync();
+            Materias = await materiaService.ListarMateriasAsync();
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al cargar datos: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task RegistrarCalificacion()
+    {
+        try
+        {
+            await calificacionService.RegistrarCalificacionAsync(calificacion);
+            blazorStrap.Toaster.Add("¡Calificación registrada exitosamente!", options => options.CloseAfter = 5000);
+            calificaciones = await calificacionService.ListarCalificacionesAsync();
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al registrar la calificación: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task DeleteCalificacion(int id)
+    {
+        var success = await calificacionService.EliminarCalificacionAsync(id);
+        if (success)
+        {
+            calificaciones.RemoveAll(c => c.Id == id);
+        }
+    }
+
+    private string GetEditUrl(int id)
+    {
+        return $"calificaciones/edit/{id}";
+    }
+
+    private void CrearCalificacion()
+    {
+        navigation.NavigateTo("/calificaciones/agregarcalificacion");
+    }
+}

@@ -7,6 +7,7 @@
 @inject IBlazorStrap blazorStrap
 @inject EstudianteService estudianteService
 @inject CursoService cursoService
+@inject NavigationManager navigation
 
 <h2 class="text-center">ESTUDIANTES</h2>
 
@@ -16,7 +17,7 @@
 }
 else
 {
-    <BSButton Color="BlazorStrap.BSColor.Success" Target="modalRegistrarEstudiante">Registrar Nuevo Estudiante</BSButton>
+    <BSButton Color="BlazorStrap.BSColor.Success" @onclick="CrearEstudiante">Registrar Nuevo Estudiante</BSButton>
 
     <div class="mb-3 mt-3">
         <div class="row">
@@ -59,72 +60,20 @@ else
                     <BSTD>@estudiante.Direccion</BSTD>
                     <BSTD>@estudiante.NombreCurso</BSTD>
                     <BSTD>
-                        <BSButton Color="BlazorStrap.BSColor.Primary" Target="modalEditarCalificacion">Editar</BSButton>
+                        <NavLink class="btn btn-primary" href="@GetEditUrl(estudiante.Id)">
+                            <i class="fas fa-edit"></i> Editar
+                        </NavLink>
                         <BSButton Color="BlazorStrap.BSColor.Danger" @onclick="() => DeleteEstudiante(estudiante.Id)">Eliminar</BSButton>
                     </BSTD>
                 </BSTR>
             }
         </BSTBody>
     </BSTable>
-
-    @* Modal para registrar estudiante *@
-
-    <BSModal DataId="modalRegistrarEstudiante" OnShow="@CargarDatosParaListar" HideOnValidSubmit="true" IsStaticBackdrop="true">
-        <BSForm Model="model" OnValidSubmit="@RegistrarEstudiante">
-            <DataAnnotationsValidator />
-            <BSModalHeader>Registrar Estudiante</BSModalHeader>
-            <BSModalContent>
-                <BSValidationSummary />
-
-                <div class="mb-3">
-                    <BSLabel>Nombre</BSLabel>
-                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Nombre" />
-                    <BSFeedback For="@(() => model.Nombre)" />
-                </div>
-
-                <div class="mb-3">
-                    <BSLabel>Apellido</BSLabel>
-                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Apellido" />
-                    <BSFeedback For="@(() => model.Apellido)" />
-                </div>
-
-                <div class="mb-3">
-                    <BSLabel>Fecha Nacimiento</BSLabel>
-                    <BSInput InputType="InputType.Date" TValue="DateTime" @bind-value="model.FechaNacimiento" />
-                    <BSFeedback For="@(() => model.FechaNacimiento)" />
-                </div>
-
-                <div class="mb-3">
-                    <BSLabel>Dirección</BSLabel>
-                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Direccion" />
-                    <BSFeedback For="@(() => model.Direccion)" />
-                </div>
-
-                <div class="mb-3">
-                    <BSLabel>Curso</BSLabel>
-                    <BSInput InputType="InputType.Select" TValue="int" @bind-value="model.IdCurso">
-                        <option value="">Seleccione un curso</option>
-                        @foreach (var curso in Cursos)
-                        {
-                            <option value="@curso.Id">@curso.Nombre</option>
-                        }
-                    </BSInput>
-                    <BSFeedback For="@(() => model.IdCurso)" />
-                </div>
-
-            </BSModalContent>
-            <BSModalFooter>
-                <BSButton Target="modalRegistrarEstudiante">Cancelar</BSButton>
-                <BSButton IsSubmit="true" Color="BSColor.Primary">Registrar</BSButton>
-            </BSModalFooter>
-        </BSForm>
-    </BSModal>
 }
 
 @code {
     private List<EstudianteDTO> estudiantes;
     private EstudianteDTO estudiante;
-    private ModEstudianteDTO model = new ModEstudianteDTO();
     private List<CursoDTO> Cursos = new List<CursoDTO>();
     private string filtroNombre = string.Empty;
     private string filtroApellido = string.Empty;
@@ -153,7 +102,7 @@ else
         try
         {
             Cursos = await cursoService.ListarCursosAsync();
-            model.FechaNacimiento = DateTime.Now;
+            estudiante.FechaNacimiento = DateTime.Now;
         }
         catch (Exception ex)
         {
@@ -177,7 +126,7 @@ else
     {
         try
         {
-            await estudianteService.RegistrarEstudianteAsync(model);
+            await estudianteService.RegistrarEstudianteAsync(estudiante);
             blazorStrap.Toaster.Add("¡Estudiante registrado exitosamente!", options => options.CloseAfter = 5000);
             estudiantes = await estudianteService.ListarEstudiantesAsync();
         }
@@ -205,5 +154,15 @@ else
         {
             blazorStrap.Toaster.Add($"Error al eliminar el estudiante: {ex.Message}", options => options.CloseAfter = 5000);
         }
+    }
+
+    private string GetEditUrl(int id)
+    {
+        return $"estudiantes/edit/{id}";
+    }
+
+    private void CrearEstudiante()
+    {
+        navigation.NavigateTo("/estudiantes/agregarestudiante");
     }
 }

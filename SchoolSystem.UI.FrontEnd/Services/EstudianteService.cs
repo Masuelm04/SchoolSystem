@@ -55,7 +55,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<EstudianteDTO> RegistrarEstudianteAsync(ModEstudianteDTO nuevoEstudiante)
+        public async Task RegistrarEstudianteAsync(EstudianteDTO nuevoEstudiante)
         {
             if (nuevoEstudiante == null)
             {
@@ -66,7 +66,6 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PostAsJsonAsync("api/Estudiantes/RegistrarEstudiante", nuevoEstudiante);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<EstudianteDTO>();
             }
             catch (Exception ex)
             {
@@ -74,7 +73,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<EstudianteResponseDTO> EditarEstudianteAsync(int id, ModEstudianteDTO estudianteActualizado)
+        public async Task EditarEstudianteAsync(int id, EstudianteDTO estudianteActualizado)
         {
             if (id <= 0)
             {
@@ -90,7 +89,6 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PutAsJsonAsync($"api/Estudiantes/EditarEstudiante/{id}", estudianteActualizado);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<EstudianteResponseDTO>();
             }
             catch (Exception ex)
             {
@@ -151,20 +149,5 @@ namespace SchoolSystem.UI.FrontEnd.Services
                 throw new ApplicationException("Error al filtrar los estudiantes.", ex);
             }
         }
-
-        //public async Task<List<EstudianteDTO>> FiltrarEstudiantesAsync(string nombre, string apellido, string curso)
-        //{
-        //    try
-        //    {
-        //        var url = $"api/Estudiantes/FiltrarEstudiantes?nombre={nombre}&apellido={apellido}&curso={curso}";
-        //        var estudiantes = await _httpClient.GetFromJsonAsync<List<EstudianteDTO>>(url);
-
-        //        return estudiantes;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new ApplicationException("Error al filtrar los estudiantes.", ex);
-        //    }
-        //}
     }
 }

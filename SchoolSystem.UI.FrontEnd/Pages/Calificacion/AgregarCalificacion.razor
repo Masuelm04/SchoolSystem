@@ -1,0 +1,106 @@
+﻿<BSToaster />
+@page "/calificaciones/agregarcalificacion"
+@using SchoolSystem.Core.DTOs.Calificacion
+@using SchoolSystem.Core.DTOs.Estudiante
+@using SchoolSystem.Core.DTOs.Materia
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject CalificacionService calificacionService
+@inject EstudianteService estudianteService
+@inject MateriaService materiaService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<EditForm Model="calificacion" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <div class="mb-3">
+            <BSButton Color="BSColor.Secondary" @onclick="Volver">Volver</BSButton>
+        </div>
+
+        <div class="mb-3 text-center">
+            <h2>REGISTRAR CALIFICACION</h2>
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Estudiante</BSLabel>
+            @if (Estudiantes != null && Estudiantes.Any())
+            {
+                <BSInput InputType="InputType.Select" TValue="int" @bind-value="calificacion.IdEstudiante">
+                    <option value="">Seleccione un estudiante</option>
+                    @foreach (var estudiante in Estudiantes)
+                    {
+                        <option value="@estudiante.Id">@($"{estudiante.Nombre} {estudiante.Apellido} - {estudiante.NombreCurso}")</option>
+                    }
+                </BSInput>
+                <BSFeedback For="@(() => calificacion.IdEstudiante)" />
+            }
+            else
+            {
+                <p>No hay estudiantes disponibles</p>
+            }
+
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Materia</BSLabel>
+            @if (Materias != null && Materias.Any())
+            {
+                <BSInput InputType="InputType.Select" TValue="int" @bind-value="calificacion.IdMateria">
+                    <option value="">Seleccione un estado</option>
+                    @foreach (var materia in Materias)
+                    {
+                        <option value="@materia.Id">@($"{materia.Nombre}")</option>
+                    }
+                </BSInput>
+                <BSFeedback For="@(() => calificacion.IdMateria)" />
+            }
+            else
+            {
+                <p>No hay materias disponibles</p>
+            }
+
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Calificacion</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="int" @bind-value="calificacion.Nota" />
+        </div>
+
+        <div class="mb-3 text-center">
+            <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    private CalificacionDTO calificacion = new CalificacionDTO()
+        {
+            IdEstudiante = 0,
+            IdMateria = 0
+
+        };
+    private List<EstudianteDTO> Estudiantes = new List<EstudianteDTO>();
+    private List<MateriaDTO> Materias = new List<MateriaDTO>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Estudiantes = await estudianteService.ListarEstudiantesAsync();
+        Materias = await materiaService.ListarMateriasAsync();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await calificacionService.RegistrarCalificacionAsync(calificacion);
+        navigation.NavigateTo("/calificaciones");
+    }
+
+    private void Volver()
+    {
+        navigation.NavigateTo("/calificaciones");
+    }
+}
