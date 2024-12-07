@@ -1,0 +1,49 @@
+﻿<BSToaster />
+@page "/materias/agregarmateria"
+@using SchoolSystem.Core.DTOs.Materia
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject MateriaService materiaService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<EditForm Model="materia" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <div class="mb-3">
+            <BSButton Color="BSColor.Secondary" @onclick="Volver">Volver</BSButton>
+        </div>
+
+        <div class="mb-3 text-center">
+            <h2>REGISTRAR MATERIA</h2>
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Materia</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="materia.Nombre" />
+        </div>
+
+        <div class="mb-3 text-center">
+            <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    private MateriaDTO materia = new MateriaDTO();
+
+    private async Task HandleValidSubmit()
+    {
+        await materiaService.RegistrarMateriaAsync(materia);
+        navigation.NavigateTo("/materias");
+    }
+
+    private void Volver()
+    {
+        navigation.NavigateTo("/materias");
+    }
+}

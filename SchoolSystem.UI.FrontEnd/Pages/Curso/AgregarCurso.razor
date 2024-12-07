@@ -1,0 +1,49 @@
+﻿<BSToaster />
+@page "/cursos/agregarcurso"
+@using SchoolSystem.Core.DTOs.Curso
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject CursoService cursoService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<EditForm Model="curso" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <div class="mb-3">
+            <BSButton Color="BSColor.Secondary" @onclick="Volver">Volver</BSButton>
+        </div>
+
+        <div class="mb-3 text-center">
+            <h2>REGISTRAR CURSO</h2>
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Curso</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="curso.Nombre" />
+        </div>
+
+        <div class="mb-3 text-center">
+            <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    private CursoDTO curso = new CursoDTO();
+
+    private async Task HandleValidSubmit()
+    {
+        await cursoService.RegistrarCursoAsync(curso);
+        navigation.NavigateTo("/cursos");
+    }
+
+    private void Volver()
+    {
+        navigation.NavigateTo("/cursos");
+    }
+}

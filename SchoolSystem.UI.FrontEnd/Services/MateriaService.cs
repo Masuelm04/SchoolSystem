@@ -93,7 +93,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<MateriaDTO> RegistrarMateriaAsync(ModMateriaDTO nuevaMateria)
+        public async Task RegistrarMateriaAsync(MateriaDTO nuevaMateria)
         {
             if (nuevaMateria == null)
             {
@@ -104,7 +104,6 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PostAsJsonAsync("api/Materias/RegistrarMateria", nuevaMateria);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<MateriaDTO>();
             }
             catch (Exception ex)
             {
@@ -148,7 +147,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<MateriaDTO> EditarMateriaAsync(int id, ModMateriaDTO materiaActualizada)
+        public async Task EditarMateriaAsync(int id, MateriaDTO materiaActualizada)
         {
             if (id <= 0)
             {
@@ -164,7 +163,6 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PutAsJsonAsync($"api/Materias/EditarMateria/{id}", materiaActualizada);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<MateriaDTO>();
             }
             catch (Exception ex)
             {

@@ -1,10 +1,11 @@
 ﻿<BSToaster />
-@page "/estadosAsistencia"
+@page "/estadosasistencia"
 @using SchoolSystem.Core.DTOs.EstadoAsistencia
 @using SchoolSystem.UI.FrontEnd.Services
 @using BlazorStrap
 @inject IBlazorStrap blazorStrap
 @inject EstadoAsistenciaService estadoAsistenciaService
+@inject NavigationManager navigation
 
 <h2 class="text-center">ESTADOS DE ASISTENCIA</h2>
 
@@ -14,7 +15,7 @@
 }
 else
 {
-    <BSButton Color="BlazorStrap.BSColor.Success" Target="modalRegistrarEstado">Registrar Nuevo Estado de Asistencia</BSButton>
+    <BSButton Color="BlazorStrap.BSColor.Success" @onclick="CrearEstadoAsistencia">Registrar Nuevo Estado de Asistencia</BSButton>
 
     <BSTable class="table-responsive-lg" Color="OTableColor" IsResponsive="OIsResponsive" IsBordered="OIsBordered" IsBorderLess="OIsBorderLess" IsCaptionTop="OIsCaptionTop" IsStriped="OIsStriped">
         <caption class="text-black">Lista de Estados de Asistencia</caption>
@@ -34,58 +35,20 @@ else
                     <BSTD>@estado.Nombre</BSTD>
                     <BSTD>@estado.Descripcion</BSTD>
                     <BSTD>
-                        <BSButton Color="BlazorStrap.BSColor.Primary" Target="modalEditarCalificacion">Editar</BSButton>
-                        <BSButton Color="BlazorStrap.BSColor.Danger" Target="modalEliminarEstado">Eliminar</BSButton>
+                        <NavLink class="btn btn-primary" href="@GetEditUrl(estado.Id)">
+                            <i class="fas fa-edit"></i> Editar
+                        </NavLink>
+                        <BSButton Color="BlazorStrap.BSColor.Danger" @onclick="() => DeleteEstado(estado.Id)">Eliminar</BSButton>
                     </BSTD>
                 </BSTR>
-
-                @* Modal para confirmar la eliminación de un estado de asistencia *@
-
-                <BSModal DataId="modalEliminarEstado" >
-                    <Header>ELIMINAR ESTADO ASISTENCIA</Header>
-                    <Content>Estás seguro de eliminar este registro?</Content>
-                    <Footer Context="modal">
-                        <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="@(() => modal.HideAsync(false))">Cancelar</BSButton>
-                        <BSButton Color="BSColor.Danger" @onclick="() => DeleteEstado(estado.Id)">Eliminar</BSButton>
-                    </Footer>
-                </BSModal>
             }
         </BSTBody>
     </BSTable>
-
-    @* Modal para registrar estado de asistencia *@
-
-    <BSModal DataId="modalRegistrarEstado" HideOnValidSubmit="true" IsStaticBackdrop="true">
-        <BSForm Model="model" OnValidSubmit="@RegistrarEstado">
-            <DataAnnotationsValidator />
-            <BSModalHeader>Registrar Calificación</BSModalHeader>
-            <BSModalContent>
-                <BSValidationSummary />
-
-                <div class="mb-3">
-                    <BSLabel>Estado</BSLabel>
-                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Nombre" />
-                    <BSFeedback For="@(() => model.Nombre)" />
-                </div>
-
-                <div class="mb-3">
-                    <BSLabel>Descripción</BSLabel>
-                    <BSInput InputType="InputType.TextArea" TValue="string" @bind-value="model.Descripcion" />
-                    <BSFeedback For="@(() => model.Descripcion)" />
-                </div>
-
-            </BSModalContent>
-            <BSModalFooter>
-                <BSButton Target="modalRegistrarEstado">Cancelar</BSButton>
-                <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
-            </BSModalFooter>
-        </BSForm>
-    </BSModal>
 }
 
 @code{
     private List<EstadoAsistenciaDTO> estados;
-    private ModEstadoAsistenciaDTO model = new ModEstadoAsistenciaDTO();
+    private EstadoAsistenciaDTO estadoAsistencia = new EstadoAsistenciaDTO();
 
     private BSColor OTableColor { get; set; } = BSColor.Default;
     private bool OIsResponsive { get; set; } = true;
@@ -110,7 +73,7 @@ else
     {
         try
         {
-            await estadoAsistenciaService.RegistrarEstadoAsistenciaAsync(model);
+            await estadoAsistenciaService.RegistrarEstadoAsistenciaAsync(estadoAsistencia);
             blazorStrap.Toaster.Add("¡Estado registrado exitosamente!", options => options.CloseAfter = 5000);
             estados = await estadoAsistenciaService.ListarEstadosAsistenciaAsync();
         }
@@ -140,5 +103,15 @@ else
         {
             blazorStrap.Toaster.Add($"Error al eliminar el estado: {ex.Message}", options => options.CloseAfter = 5000);
         }
+    }
+
+    private string GetEditUrl(int id)
+    {
+        return $"/estadosasistencia/edit/{id}";
+    }
+
+    private void CrearEstadoAsistencia()
+    {
+        navigation.NavigateTo("/estadosasistencia/agregarestadoasistencia");
     }
 }

@@ -1,0 +1,75 @@
+﻿<BSToaster />
+@page "/estadosasistencia/edit/{id:int}"
+@using SchoolSystem.Core.DTOs.EstadoAsistencia
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject EstadoAsistenciaService estadoAsistenciaService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<EditForm Model="estadoAsistencia" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <div class="mb-3">
+            <BSButton Color="BSColor.Secondary" @onclick="Volver">Volver</BSButton>
+        </div>
+
+        <div class="mb-3 text-center">
+            <h2>EDITAR ESTADO DE ASISTENCIA</h2>
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Estado</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="estadoAsistencia.Nombre" IsDisabled="true" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Descripcion</BSLabel>
+            <BSInput InputType="InputType.TextArea" TValue="string" @bind-value="estadoAsistencia.Descripcion" />
+        </div>
+
+        <div class="mb-3 text-center">
+            <BSButton IsSubmit="true" Color="BSColor.Primary">Editar</BSButton>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    private EstadoAsistenciaDTO estadoAsistencia = new EstadoAsistenciaDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            estadoAsistencia = await estadoAsistenciaService.ObtenerEstadoAsistenciaPorIdAsync(id);
+
+            if (estadoAsistencia == null)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Estado no encontrado.");
+                navigation.NavigateTo("/estadosasistencia");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al cargar datos: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await estadoAsistenciaService.EditarEstadoAsistenciaAsync(id, estadoAsistencia);
+        navigation.NavigateTo("/estadosasistencia");
+    }
+
+    private void Volver()
+    {
+        navigation.NavigateTo("/estadosasistencia");
+    }
+}

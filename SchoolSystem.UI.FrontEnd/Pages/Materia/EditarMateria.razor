@@ -1,0 +1,70 @@
+﻿<BSToaster />
+@page "/materias/edit/{id:int}"
+@using SchoolSystem.Core.DTOs.Materia
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject MateriaService materiaService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<EditForm Model="materia" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <div class="mb-3">
+            <BSButton Color="BSColor.Secondary" @onclick="Volver">Volver</BSButton>
+        </div>
+
+        <div class="mb-3 text-center">
+            <h2>EDITAR MATERIA</h2>
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Materia</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="materia.Nombre" />
+        </div>
+
+        <div class="mb-3 text-center">
+            <BSButton IsSubmit="true" Color="BSColor.Primary">Editar</BSButton>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public int id { get; set; }
+    private MateriaDTO materia = new MateriaDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            materia = await materiaService.ObtenerMateriaPorIdAsync(id);
+
+            if (materia == null)
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Materia no encontrada.");
+                navigation.NavigateTo("/materias");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            blazorStrap.Toaster.Add($"Error al cargar datos: {ex.Message}", options => options.CloseAfter = 5000);
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await materiaService.EditarMateriaAsync(id, materia);
+        navigation.NavigateTo("/materias");
+    }
+
+    private void Volver()
+    {
+        navigation.NavigateTo("/materias");
+    }
+}

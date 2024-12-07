@@ -69,7 +69,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<CursoDTO> RegistrarCursoAsync(ModCursoDTO nuevoCurso)
+        public async Task RegistrarCursoAsync(CursoDTO nuevoCurso)
         {
             if (nuevoCurso == null)
             {
@@ -80,7 +80,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PostAsJsonAsync("api/Cursos/RegistrarCurso", nuevoCurso);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<CursoDTO>();
+                //return await response.Content.ReadFromJsonAsync<CursoDTO>();
             }
             catch (Exception ex)
             {
@@ -148,7 +148,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<CursoDTO> EditarCursoAsync(int id, ModCursoDTO cursoActualizado)
+        public async Task EditarCursoAsync(int id, CursoDTO cursoActualizado)
         {
             if (id <= 0)
             {
@@ -164,7 +164,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PutAsJsonAsync($"api/Cursos/EditarCurso/{id}", cursoActualizado);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<CursoDTO>();
+                //return await response.Content.ReadFromJsonAsync<CursoDTO>();
             }
             catch (Exception ex)
             {
