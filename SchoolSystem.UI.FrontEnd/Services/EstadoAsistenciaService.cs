@@ -55,7 +55,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<EstadoAsistenciaDTO> RegistrarEstadoAsistenciaAsync(ModEstadoAsistenciaDTO nuevoEstado)
+        public async Task RegistrarEstadoAsistenciaAsync(EstadoAsistenciaDTO nuevoEstado)
         {
             if (nuevoEstado == null)
             {
@@ -66,7 +66,6 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PostAsJsonAsync("api/EstadosAsistencia/RegistrarEstadoAsistencia", nuevoEstado);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<EstadoAsistenciaDTO>();
             }
             catch (Exception ex)
             {
@@ -74,7 +73,7 @@ namespace SchoolSystem.UI.FrontEnd.Services
             }
         }
 
-        public async Task<EstadoAsistenciaDTO> EditarEstadoAsistenciaAsync(int id, ModEstadoAsistenciaDTO estadoActualizado)
+        public async Task EditarEstadoAsistenciaAsync(int id, EstadoAsistenciaDTO estadoActualizado)
         {
             if (id <= 0)
             {
@@ -90,7 +89,6 @@ namespace SchoolSystem.UI.FrontEnd.Services
             {
                 var response = await _httpClient.PutAsJsonAsync($"api/EstadosAsistencia/EditarEstadoAsistencia/{id}", estadoActualizado);
                 response.EnsureSuccessStatusCode();
-                return await response.Content.ReadFromJsonAsync<EstadoAsistenciaDTO>();
             }
             catch (Exception ex)
             {

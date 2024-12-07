@@ -5,6 +5,7 @@
 @using BlazorStrap
 @inject IBlazorStrap blazorStrap
 @inject MateriaService materiaService
+@inject NavigationManager navigation
 
 <h2 class="text-center">MATERIAS</h2>
 
@@ -14,7 +15,7 @@
 }
 else
 {
-    <BSButton Color="BlazorStrap.BSColor.Success" Target="modalRegistrarMateria">Registrar Nueva Materia</BSButton>
+    <BSButton Color="BlazorStrap.BSColor.Success" @onclick="CrearMateria">Registrar Nueva Materia</BSButton>
 
     <BSTable class="table-responsive-lg" Color="OTableColor" IsResponsive="OIsResponsive" IsBordered="OIsBordered" IsBorderLess="OIsBorderLess" IsCaptionTop="OIsCaptionTop" IsStriped="OIsStriped">
         <caption class="text-black">Lista de Materias</caption>
@@ -32,52 +33,20 @@ else
                     <BSTD AlignRow="OAlignRow" Color="OTDColor" IsActive="OIsActive">@materia.Id</BSTD>
                     <BSTD>@materia.Nombre</BSTD>
                     <BSTD>
-                        <BSButton Color="BlazorStrap.BSColor.Primary" Target="modalEditarMateria">Editar</BSButton>
-                        <BSButton Color="BlazorStrap.BSColor.Danger" Target="modalEliminarMateria">Eliminar</BSButton>
+                        <NavLink class="btn btn-primary" href="@GetEditUrl(materia.Id)">
+                            <i class="fas fa-edit"></i> Editar
+                        </NavLink>
+                        <BSButton Color="BlazorStrap.BSColor.Danger" @onclick="() => DeleteMateria(materia.Id)">Eliminar</BSButton>
                     </BSTD>
                 </BSTR>
-
-                @* Modal para confirmar la eliminación de materia *@
-
-                <BSModal DataId="modalEliminarMateria" IsStaticBackdrop="false">
-                    <Header>ELIMINAR MATERIA</Header>
-                    <Content>Estás seguro de eliminar este registro?</Content>
-                    <Footer Context="modal">
-                        <BSButton MarginStart="Margins.Auto" Color="BSColor.Secondary" @onclick="@(() => modal.HideAsync(false))">Cancelar</BSButton>
-                        <BSButton Color="BSColor.Danger" @onclick="() => DeleteMateria(materia.Id)">Eliminar</BSButton>
-                    </Footer>
-                </BSModal>
             }
         </BSTBody>
     </BSTable>
-
-    @* Modal para registrar materia *@
-
-    <BSModal DataId="modalRegistrarMateria" HideOnValidSubmit="true" IsStaticBackdrop="true">
-        <BSForm Model="model" OnValidSubmit="@RegistrarMateria">
-            <DataAnnotationsValidator />
-            <BSModalHeader>Registrar Materia</BSModalHeader>
-            <BSModalContent>
-                <BSValidationSummary />
-
-                <div class="mb-3">
-                    <BSLabel>Materia</BSLabel>
-                    <BSInput InputType="InputType.Text" TValue="string" @bind-value="model.Nombre" />
-                    <BSFeedback For="@(() => model.Nombre)" />
-                </div>
-
-            </BSModalContent>
-            <BSModalFooter>
-                <BSButton Target="modalRegistrarEstado">Cancelar</BSButton>
-                <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
-            </BSModalFooter>
-        </BSForm>
-    </BSModal>
 }
 
 @code{
     private List<MateriaDTO> materias;
-    private ModMateriaDTO model = new ModMateriaDTO();
+    private MateriaDTO materia = new MateriaDTO();
 
     private BSColor OTableColor { get; set; } = BSColor.Default;
     private bool OIsResponsive { get; set; } = true;
@@ -101,7 +70,7 @@ else
     {
         try
         {
-            await materiaService.RegistrarMateriaAsync(model);
+            await materiaService.RegistrarMateriaAsync(materia);
             blazorStrap.Toaster.Add("¡Materia registrada exitosamente!", options => options.CloseAfter = 5000);
             materias = await materiaService.ListarMateriasAsync();
         }
@@ -129,5 +98,15 @@ else
         {
             blazorStrap.Toaster.Add($"Error al eliminar la materia: {ex.Message}", options => options.CloseAfter = 5000);
         }
+    }
+
+    private string GetEditUrl(int id)
+    {
+        return $"materias/edit/{id}";
+    }
+
+    private void CrearMateria()
+    {
+        navigation.NavigateTo("/materias/agregarmateria");
     }
 }

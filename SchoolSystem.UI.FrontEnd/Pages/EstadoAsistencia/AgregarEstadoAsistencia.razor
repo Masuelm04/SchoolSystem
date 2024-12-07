@@ -1,0 +1,54 @@
+﻿<BSToaster />
+@page "/estadosasistencia/agregarestadoasistencia"
+@using SchoolSystem.Core.DTOs.EstadoAsistencia
+@using SchoolSystem.UI.FrontEnd.Services
+@using BlazorStrap
+@inject IBlazorStrap blazorStrap
+@inject EstadoAsistenciaService estadoAsistenciaService
+@inject IJSRuntime JSRuntime
+@inject NavigationManager navigation
+
+<EditForm Model="estadoAsistencia" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <div class="mb-3">
+            <BSButton Color="BSColor.Secondary" @onclick="Volver">Volver</BSButton>
+        </div>
+
+        <div class="mb-3 text-center">
+            <h2>REGISTRAR ESTADO DE ASISTENCIA</h2>
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Estado</BSLabel>
+            <BSInput InputType="InputType.Text" TValue="string" @bind-value="estadoAsistencia.Nombre" />
+        </div>
+
+        <div class="mb-3">
+            <BSLabel>Descripcion</BSLabel>
+            <BSInput InputType="InputType.TextArea" TValue="string" @bind-value="estadoAsistencia.Descripcion" />
+        </div>
+
+        <div class="mb-3 text-center">
+            <BSButton IsSubmit="true" Color="BSColor.Success">Registrar</BSButton>
+        </div>
+    </div>
+
+</EditForm>
+
+@code {
+    private EstadoAsistenciaDTO estadoAsistencia = new EstadoAsistenciaDTO();
+
+    private async Task HandleValidSubmit()
+    {
+        await estadoAsistenciaService.RegistrarEstadoAsistenciaAsync(estadoAsistencia);
+        navigation.NavigateTo("/estadosasistencia");
+    }
+
+    private void Volver()
+    {
+        navigation.NavigateTo("/estadosasistencia");
+    }
+}
