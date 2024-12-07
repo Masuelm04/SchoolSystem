@@ -12,7 +12,7 @@
 
 <EditForm Model="estudiante" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+   @*  <ValidationSummary /> *@
 
     <div>
         <div class="mb-3">
@@ -26,11 +26,13 @@
         <div class="mb-3">
             <BSLabel>Nombre</BSLabel>
             <BSInput InputType="InputType.Text" TValue="string" @bind-value="estudiante.Nombre" />
+            <ValidationMessage For="@(() => estudiante.Nombre)" />
         </div>
 
         <div class="mb-3">
             <BSLabel>Apellido</BSLabel>
             <BSInput InputType="InputType.Text" TValue="string" @bind-value="estudiante.Apellido" />
+            <ValidationMessage For="@(() => estudiante.Apellido)" />
         </div>
 
         <div class="mb-3">
@@ -41,6 +43,7 @@
         <div class="mb-3">
             <BSLabel>Direccion</BSLabel>
             <BSInput InputType="InputType.Text" TValue="string" @bind-value="estudiante.Direccion" />
+            <ValidationMessage For="@(() => estudiante.Direccion)" />
         </div>
 
         <div class="mb-3">
@@ -73,7 +76,7 @@
 @code {
     private EstudianteDTO estudiante = new EstudianteDTO()
         {
-            IdCurso = 0,
+            IdCurso = 2,
             FechaNacimiento = DateTime.Today
         };
     private List<CursoDTO> Cursos = new List<CursoDTO>();

@@ -10,7 +10,8 @@ namespace SchoolSystem.Core.DTOs.Calificacion
     public class CalificacionDTO
     {
         public int Id { get; set; }
-        public int Nota { get; set; }
+        [Required(ErrorMessage = "La nota es obligatoria")]
+        public int Nota { get; set; } 
         public string Literal
         {
             get

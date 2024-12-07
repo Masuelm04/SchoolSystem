@@ -10,7 +10,7 @@
 
 <EditForm Model="estadoAsistencia" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    @* <ValidationSummary /> *@
 
     <div>
         <div class="mb-3">
@@ -24,11 +24,13 @@
         <div class="mb-3">
             <BSLabel>Estado</BSLabel>
             <BSInput InputType="InputType.Text" TValue="string" @bind-value="estadoAsistencia.Nombre" />
+            <ValidationMessage For="@(() => estadoAsistencia.Nombre)" />
         </div>
 
         <div class="mb-3">
             <BSLabel>Descripcion</BSLabel>
             <BSInput InputType="InputType.TextArea" TValue="string" @bind-value="estadoAsistencia.Descripcion" />
+            <ValidationMessage For="@(() => estadoAsistencia.Descripcion)" />
         </div>
 
         <div class="mb-3 text-center">

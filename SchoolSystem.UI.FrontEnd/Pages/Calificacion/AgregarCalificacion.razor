@@ -14,7 +14,7 @@
 
 <EditForm Model="calificacion" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    @* <ValidationSummary /> *@
 
     <div>
         <div class="mb-3">
@@ -37,6 +37,7 @@
                     }
                 </BSInput>
                 <BSFeedback For="@(() => calificacion.IdEstudiante)" />
+                @* <ValidationMessage For="@(() => calificacion.IdEstudiante)" /> *@
             }
             else
             {
@@ -57,6 +58,7 @@
                     }
                 </BSInput>
                 <BSFeedback For="@(() => calificacion.IdMateria)" />
+                @* <ValidationMessage For="@(() => calificacion.IdMateria)" /> *@
             }
             else
             {
@@ -68,6 +70,7 @@
         <div class="mb-3">
             <BSLabel>Calificacion</BSLabel>
             <BSInput InputType="InputType.Text" TValue="int" @bind-value="calificacion.Nota" />
+            <ValidationMessage For="@(() => calificacion.Nota)" />
         </div>
 
         <div class="mb-3 text-center">
@@ -80,8 +83,8 @@
 @code {
     private CalificacionDTO calificacion = new CalificacionDTO()
         {
-            IdEstudiante = 0,
-            IdMateria = 0
+            IdEstudiante = 2,
+            IdMateria = 1
 
         };
     private List<EstudianteDTO> Estudiantes = new List<EstudianteDTO>();

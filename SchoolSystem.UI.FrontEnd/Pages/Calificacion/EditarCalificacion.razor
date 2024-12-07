@@ -14,7 +14,7 @@
 
 <EditForm Model="calificacion" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    @* <ValidationSummary /> *@
 
     <div>
         <div class="mb-3">
@@ -110,6 +110,13 @@
     {
         await calificacionService.EditarCalificacionAsync(id, calificacion);
         navigation.NavigateTo("/calificaciones");
+
+        blazorStrap.Toaster.Add("¡Calificacion editada exitosamente!", o =>
+            {
+                o.Color = BSColor.Primary;
+                o.HasIcon = true;
+                o.CloseAfter = 5000;
+            });
     }
 
     private void Volver()

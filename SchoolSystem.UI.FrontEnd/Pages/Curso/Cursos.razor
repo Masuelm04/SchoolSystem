@@ -71,8 +71,15 @@ else
         try
         {
             await cursoService.RegistrarCursoAsync(curso);
-            blazorStrap.Toaster.Add("¡Curso registrada exitosamente!", options => options.CloseAfter = 5000);
+            
             cursos = await cursoService.ListarCursosAsync();
+
+            blazorStrap.Toaster.Add("¡Curso registrado exitosamente!", o =>
+            {
+                o.Color = BSColor.Success;
+                o.HasIcon = true;
+                o.CloseAfter = 5000;
+            });
         }
         catch (Exception ex)
         {
