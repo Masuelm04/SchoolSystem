@@ -110,6 +110,13 @@
     {
         await asistenciaService.EditarAsistenciaAsync(id, asistencia);
         navigation.NavigateTo("/asistencias");
+
+        blazorStrap.Toaster.Add("¡Asistencia editada exitosamente!", o =>
+            {
+                o.Color = BSColor.Primary;
+                o.HasIcon = true;
+                o.CloseAfter = 5000;
+            });
     }
 
     private void Volver()

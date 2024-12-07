@@ -11,6 +11,7 @@ namespace SchoolSystem.Core.DTOs.Curso
     public class CursoDTO
     {
         public int Id { get; set; }
+        [Required(ErrorMessage = "El nombre del curso es obligatorio")]
         [StringLength(30)]
         public string Nombre { get; set; }
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]

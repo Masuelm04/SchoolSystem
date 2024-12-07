@@ -12,7 +12,7 @@
 
 <EditForm Model="estudiante" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    @* <ValidationSummary /> *@
 
     <div>
         <div class="mb-3">
@@ -41,6 +41,7 @@
         <div class="mb-3">
             <BSLabel>Direccion</BSLabel>
             <BSInput InputType="InputType.Text" TValue="string" @bind-value="estudiante.Direccion" />
+            <ValidationMessage For="@(() => estudiante.Direccion)" />
         </div>
 
         <div class="mb-3">
@@ -101,6 +102,13 @@
     {
         await estudianteService.EditarEstudianteAsync(id, estudiante);
         navigation.NavigateTo("/estudiantes");
+
+        blazorStrap.Toaster.Add("¡Estudiante editado exitosamente!", o =>
+            {
+                o.Color = BSColor.Primary;
+                o.HasIcon = true;
+                o.CloseAfter = 5000;
+            });
     }
 
     private void Volver()

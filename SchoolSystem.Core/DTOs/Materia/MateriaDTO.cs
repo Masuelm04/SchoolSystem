@@ -11,6 +11,7 @@ namespace SchoolSystem.Core.DTOs.Materia
     public class MateriaDTO
     {
         public int Id { get; set; }
+        [Required(ErrorMessage = "El nombre de la materia es obligatorio")]
         [StringLength(30)]
         public string Nombre { get; set; }
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd HH:mm:ss}")]
